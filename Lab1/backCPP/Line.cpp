@@ -15,16 +15,18 @@ double getB(Line2D *lin){ return lin->getB();}
 double getC(Line2D *lin){ return lin->getC();}
 
 int Line2D::relation2Line(Line2D lin) {
-    if (_a == lin._a and _b == lin._b and _c == lin._c){
+    if ((_a == lin._a and _b == lin._b and _c == lin._c) or
+        (_a / lin._a == _b / lin._b and _a / lin._a == _c / lin._c)){
 //        return "Equal";
         return 1;
     }
-    else if (_a == lin._a and _b == lin._b){
+    else if ((_a == lin._a and _b == lin._b) or
+             (_a / lin._a == _b / lin._b)){
 //        return "Parallel";
         return 2;
     }
     else{
-//        return "Don't overlap";
+//        return "Overlap";
         return 3;
     }
 }

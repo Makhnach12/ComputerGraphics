@@ -8,15 +8,6 @@ bool isRayIntersectSegment(Dot2D* dotA, Dot2D* dotB, Dot2D* dotC, Dot2D* dotD){
     Line2D lin1(*dotA, *dotB);
     Line2D lin2(*dotC, *dotD);
     Dot2D res(1, 1);
-//    if (lin1.findPointIntersec(lin2, res)){
-//        if (res.getX() >= dotC->getX() && res.getX() <= dotD->getX() &&
-//            res.getY() >= dotC->getY() && res.getY() <= dotD->getY()){
-//            if ((res.getX() > dotA->getX()) == (dotB->getX() > dotA->getX())
-//                && (res.getY() > dotA->getY()) == (dotB->getY() > dotA->getY())){
-//                return true;
-//            }
-//        }
-//    }
     if (((dotC->getX() >= dotA->getX()) == (dotB->getX() >= dotA->getX())
         && (dotC->getY() >= dotA->getY()) == (dotB->getY() >= dotA->getY())) ||
         ((dotD->getX() >= dotA->getX()) == (dotB->getX() >= dotA->getX())

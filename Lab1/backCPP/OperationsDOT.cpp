@@ -42,6 +42,9 @@ double findAngle3D(Dot3D& dot1, Dot3D& dot2, Dot3D& dot3) {
                      dot1.getZ() - dot2.getZ());
     Dot3D dot3_shift(dot3.getX() - dot2.getX(), dot3.getY() - dot2.getY(),
                      dot3.getZ() - dot2.getZ());
+    if (vector3DLen(dot1_shift) * vector3DLen(dot3_shift) == 0){
+        return 0;
+    }
     return acos(round(sсalar3D(dot1_shift, dot3_shift) /
                       (vector3DLen(dot1_shift) * vector3DLen(dot3_shift)) * 1000) / 1000);
 }

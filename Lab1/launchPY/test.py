@@ -14,6 +14,9 @@ class TestLab1(unittest.TestCase):
     def testRelation2Line3(self):
         self.assertEqual(relation2Line((4, 4, 4), (1, 2, 3)), 3)
 
+    def testRelation2Line4(self):
+        self.assertEqual(relation2Line((2, 2, 2), (8, 8, 8)), 1)
+
     def testIsRayIntersectSegment1(self):
         self.assertEqual(isRayIntersectSegment((0, 0), (1, 0), (-2, 0),
                                                (-1, 0)), False)
@@ -34,6 +37,10 @@ class TestLab1(unittest.TestCase):
         self.assertEqual(isRayIntersectSegment((0, 0), (1, 0), (100, 0),
                                                (101, 0)), True)
 
+    def testIsRayIntersectSegment6(self):
+        self.assertEqual(isRayIntersectSegment((0, 0), (1, 1), (-1, -1),
+                                               (-1, -1)), False)
+
     def testAnalyzeAngle1(self):
         self.assertEqual(analyzeAngle((0, 1, 0), (0, 0, 0), (1, 0, 0)), 2)
 
@@ -52,6 +59,9 @@ class TestLab1(unittest.TestCase):
     def testAnalyzeDots2(self):
         self.assertEqual(analyzeDots((0, 0, 0), (1, 1, 1), (2, 2, 0)), False)
 
+    def testAnalyzeDots3(self):
+        self.assertEqual(analyzeDots((0, 0, 0), (0, 0, 0), (0, 0, 1)), True)
+
     def testAnalyzeTriangle1(self):
         self.assertEqual(analyzeTriangle((0, 0, 0), (1, 0, 0), (0, 1, 0)),
                          [0.70711, 0.70711, 0.70721])
@@ -63,6 +73,10 @@ class TestLab1(unittest.TestCase):
     def testAnalyzeTriangle3(self):
         self.assertEqual(analyzeTriangle((0, -1, 0), (-1, 1, 0), (-2, 1, 0)),
                          [2.0, 2.5, 2.46635])
+
+    def testAnalyzeTriangle4(self):
+        self.assertEqual(analyzeTriangle((0, 0, 0), (2, 0, 0), (0, 8, 0)),
+                         [1.94029, 4.12311, 2.26725])
 
 
 if __name__ == "__main__":
