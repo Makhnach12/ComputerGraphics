@@ -18,6 +18,60 @@ def drawAxes(canvas):
                        arrow=tk.LAST)
 
 
+def changeScaleX(root, star):
+    label_above_button = tk.Label(root, text="Масштаб по OX")
+    label_above_button.place(x=WIDTH + 70, y=HEIGHT // 5 + 65)
+
+    SCALE_X_UP = tk.Button(root, text="Увеличить", command=star.scaleOX_UP)
+    SCALE_X_UP.place(x=WIDTH + 130, y=HEIGHT // 5 + 85)
+
+    SCALE_X_DOWN = tk.Button(root, text="Уменьшить", command=star.scaleOX_DOWN)
+    SCALE_X_DOWN.place(x=WIDTH + 25, y=HEIGHT // 5 + 85)
+
+
+def changeScaleY(root, star):
+    label_above_button = tk.Label(root, text="Масштаб по OY")
+    label_above_button.place(x=WIDTH + 70, y=HEIGHT // 5 + 115)
+
+    SCALE_X_UP = tk.Button(root, text="Увеличить", command=star.scaleOY_UP)
+    SCALE_X_UP.place(x=WIDTH + 130, y=HEIGHT // 5 + 135)
+
+    SCALE_X_DOWN = tk.Button(root, text="Уменьшить", command=star.scaleOY_DOWN)
+    SCALE_X_DOWN.place(x=WIDTH + 25, y=HEIGHT // 5 + 135)
+
+
+def changeTurn(root, star):
+    def getAngle():
+        angle = int(entry.get())
+        entry.delete(0, tk.END)
+        star.turnStar(angle)
+
+    label_above_button = tk.Label(root, text="Поворот относительно начала")
+    label_above_button.place(x=WIDTH + 30, y=HEIGHT // 5 + 165)
+
+    entry = tk.Entry(root, width=10)
+    entry.place(x=WIDTH + 25, y=HEIGHT // 5 + 195)
+
+    btn = tk.Button(root, text="Повернуть", command=getAngle)
+    btn.place(x=WIDTH + 130, y=HEIGHT // 5 + 194)
+
+
+def changeTurnToPoint(root, star):
+    def getAngle():
+        angle = int(entry.get())
+        entry.delete(0, tk.END)
+        star.turnStar(angle)
+
+    label_above_button = tk.Label(root, text="Поворот относительно точки")
+    label_above_button.place(x=WIDTH + 30, y=HEIGHT // 5 + 165)
+
+    entry = tk.Entry(root, width=10)
+    entry.place(x=WIDTH + 25, y=HEIGHT // 5 + 195)
+
+    btn = tk.Button(root, text="Повернуть", command=getAngle)
+    btn.place(x=WIDTH + 130, y=HEIGHT // 5 + 194)
+
+
 class Window:
     def __init__(self):
         self.root = tk.Tk()
@@ -25,7 +79,7 @@ class Window:
         self.canvas = tk.Canvas(self.root, width=WIDTH, height=HEIGHT)
         drawGrid(self.canvas)
         drawAxes(self.canvas)
-        self.star = Star(self.canvas, (WIDTH // 2, HEIGHT // 2))
+        self.star = Star(self.canvas)
         self.canvas.pack(side=tk.LEFT)
         self.down_button = tk.Button(self.root, text="↓", width=10,
                                      command=self.star.shiftDown)
@@ -38,17 +92,25 @@ class Window:
         self.left_button.place(x=WIDTH + 10, y=HEIGHT // 10 - 38)
 
         right_button = tk.Button(self.root, text="→", width=1, height=3,
-                                      command=self.star.shiftRight)
+                                 command=self.star.shiftRight)
         right_button.place(x=WIDTH + 190, y=HEIGHT // 10 - 38)
 
         reflectOX = tk.Button(self.root, text="симметрия OX",
-                                   command=self.star.reflectOX)
+                              command=self.star.reflectOX)
         reflectOX.place(x=WIDTH + 60, y=HEIGHT // 5)
 
         reflectOY = tk.Button(self.root, text="симметрия OY",
                               command=self.star.reflectOY)
-        reflectOY.place(x=WIDTH + 60, y=HEIGHT // 5 - 20)
+        reflectOY.place(x=WIDTH + 60, y=HEIGHT // 5 - 30)
 
+        reflect = tk.Button(self.root, text="симметрия по прямой",
+                            command=self.star.reflect)
+        reflect.place(x=WIDTH + 40, y=HEIGHT // 5 + 30)
+
+        changeScaleX(self.root, self.star)
+        changeScaleY(self.root, self.star)
+
+        changeTurn(self.root, self.star)
 
     def shiftStar(self, x_shift: int, y_shift: int):
         self.star.changeCoors(x_shift, y_shift)

@@ -85,11 +85,11 @@
 
 # root.mainloop()
 from Lab2.Root import Window
-
-# root = tk.Tk()
-# canvas = tk.Canvas(root, width=400, height=400)
-# canvas.pack()
+#
+# # root = tk.Tk()
+# # canvas = tk.Canvas(root, width=400, height=400)
+# # canvas.pack()
 win = Window()
-# win.createStar(300, 300)
-# win.shiftStar(100, 100)
+# # win.createStar(300, 300)
+# # win.shiftStar(100, 100)
 win.root.mainloop()
