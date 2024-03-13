@@ -4,11 +4,11 @@ from Lab2.Parameters import WIDTH, HEIGHT
 from Lab2.Star import Star
 
 
-def drawGrid(canvas):
+def drawGrid(canvas, fill: str = "gray"):
     for i in range(0, WIDTH, 20):
-        canvas.create_line(i, 0, i, WIDTH, fill="gray")
+        canvas.create_line(i, 0, i, WIDTH, fill=fill)
     for i in range(0, HEIGHT, 20):
-        canvas.create_line(0, i, HEIGHT, i, fill="gray")
+        canvas.create_line(0, i, HEIGHT, i, fill=fill)
 
 
 def drawAxes(canvas):
@@ -44,7 +44,7 @@ def changeTurn(root, star):
     def turnStar():
         angle = int(entry.get())
         entry.delete(0, tk.END)
-        star.turnStar(angle)
+        star.turnStarToDot(angle, star.center)
 
     label_above_button = tk.Label(root, text="Поворот относительно начала")
     label_above_button.place(x=WIDTH + 30, y=HEIGHT // 5 + 165)

@@ -13,12 +13,14 @@ START_POSITION = [(-50, -68), (0, -32), (50, -68), (30, -10), (80, 26),
 
 class Star:
     def __init__(self, canvas):
+        self.__center = Dot(0, 0)
         self.__canvas = canvas
         self.__lines: list = []
         self.__dotes: list[Dot] = [Dot(*coords) for coords in START_POSITION]
         for i in range(0, len(self.__dotes) - 1):
             self.__lines.append(self.__canvas.create_line(self.__dotes[i].coors,
-                                                          self.__dotes[i + 1].coors,
+                                                          self.__dotes[
+                                                              i + 1].coors,
                                                           fill='red', width=2))
         self.__lines.append(
             self.__canvas.create_line(self.__dotes[0].coors,
@@ -45,6 +47,10 @@ class Star:
                                       self.__dotes[1].coors,
                                       fill='red', width=2))
 
+    @property
+    def center(self):
+        return self.__center.coors[0] - 300, self.__center.coors[1] - 300
+
     def __changeLines(self):
         for i in range(0, len(self.__dotes) - 1):
             self.__canvas.coords(self.__lines[i], *self.__dotes[i].coors,
@@ -68,6 +74,7 @@ class Star:
     def __changeCoors(self, mat):
         for dot in self.__dotes:
             dot.multMat(mat)
+        self.__center.multMat(mat)
         self.__changeLines()
 
     def shiftDown(self):
@@ -114,5 +121,3 @@ class Star:
     def goToBegin(self):
         self.__dotes: list[Dot] = [Dot(*coords) for coords in START_POSITION]
         self.__changeLines()
-
-
