@@ -1,6 +1,7 @@
 import numpy as np
 
-from Lab2.Parameters import getMatrixTurning, getMatrixTurningToPoint
+from Lab2.Parameters import getMatrixTurning, getMatrixTurningToPoint, \
+    MATRIX_DOWN, MATRIX_UP
 from Lab2.dot import Dot
 
 FIRST_VINT = [(120, -60), (110, -50), (110, -30), (120, -20),
@@ -10,6 +11,7 @@ FIRST_VINT = [(120, -60), (110, -50), (110, -30), (120, -20),
 
 class Propeller:
     def __init__(self, canvas, root):
+        self.mid = [120, -60]
         self.__root = root
         self.__canvas = canvas
         self.__lines = []
@@ -34,5 +36,13 @@ class Propeller:
 
     def turnPropeller(self, angle: int = 5):
         angle = (angle * np.pi) / 180
-        self.__changeCoors(getMatrixTurningToPoint((120, -60), 10))
+        self.__changeCoors(getMatrixTurningToPoint(self.mid, 10))
         self.__root.after(100, self.turnPropeller)
+
+    def shiftDown(self):
+        self.mid[1] -= 1
+        self.__changeCoors(MATRIX_DOWN)
+
+    def shiftUp(self):
+        self.mid[1] += 1
+        self.__changeCoors(MATRIX_UP)

@@ -1,8 +1,11 @@
 import tkinter as tk
 
 from Lab2.Parameters import WIDTH, HEIGHT
+from Lab2.Plane import Plane
+from Lab2.Propeller import Propeller
 from Lab2.Star import Star
 
+SUM = 0
 
 def drawGrid(canvas, fill: str = "gray"):
     for i in range(0, WIDTH, 20):
@@ -93,6 +96,45 @@ def goToBegin(root, star):
               command=star.goToBegin).place(x=WIDTH + 5, y=HEIGHT // 5 + 354)
 
 
+def lab2():
+    root = tk.Tk()
+    root.title("LAB3.COM")
+    canvas = tk.Canvas(root, width=600, height=600, background='#F7F6E7')
+    canvas.pack()
+    drawGrid(canvas, '#C1C0B9')
+    plane = Plane(canvas)
+    p = Propeller(canvas, root)
+
+    def goDown():
+        global SUM
+        p.shiftDown()
+        plane.shiftDown()
+        SUM += 100
+        if SUM // 1000 % 2 == 0:
+            root.after(100, goDown)
+        else:
+            root.after(100, goUp)
+
+    def goUp():
+        global SUM
+        p.shiftUp()
+        plane.shiftUp()
+        SUM += 100
+        if SUM // 1000 % 2 == 0:
+            root.after(100, goDown)
+        else:
+            root.after(100, goUp)
+
+    goDown()
+    p.turnPropeller()
+    root.mainloop()
+
+
+def goToLab2(root):
+    tk.Button(root, text="перейти ко второй части",
+              command=lab2).place(x=WIDTH + 5, y=HEIGHT // 5 + 394)
+
+
 class Window:
     def __init__(self):
         self.root = tk.Tk()
@@ -136,3 +178,4 @@ class Window:
 
         goToBegin(self.root, self.star)
 
+        goToLab2(self.root)
