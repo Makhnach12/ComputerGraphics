@@ -41,7 +41,7 @@ def changeScaleY(root, star):
 
 
 def changeTurn(root, star):
-    def getAngle():
+    def turnStar():
         angle = int(entry.get())
         entry.delete(0, tk.END)
         star.turnStar(angle)
@@ -52,24 +52,45 @@ def changeTurn(root, star):
     entry = tk.Entry(root, width=10)
     entry.place(x=WIDTH + 25, y=HEIGHT // 5 + 195)
 
-    btn = tk.Button(root, text="Повернуть", command=getAngle)
+    btn = tk.Button(root, text="Повернуть", command=turnStar)
     btn.place(x=WIDTH + 130, y=HEIGHT // 5 + 194)
 
 
 def changeTurnToPoint(root, star):
-    def getAngle():
+    def turnStar():
+        x = int(entryX.get())
+        y = int(entryY.get())
         angle = int(entry.get())
         entry.delete(0, tk.END)
-        star.turnStar(angle)
+        entryX.delete(0, tk.END)
+        entryY.delete(0, tk.END)
+        star.turnStarToDot(angle, (x, y))
 
     label_above_button = tk.Label(root, text="Поворот относительно точки")
-    label_above_button.place(x=WIDTH + 30, y=HEIGHT // 5 + 165)
+    label_above_button.place(x=WIDTH + 30, y=HEIGHT // 5 + 235)
+
+    tk.Label(root, text="Координата x:").place(x=WIDTH + 30,
+                                               y=HEIGHT // 5 + 265)
+
+    entryX = tk.Entry(root, width=10)
+    entryX.place(x=WIDTH + 25, y=HEIGHT // 5 + 295)
+
+    tk.Label(root, text="Координата y:").place(x=WIDTH + 130, y=HEIGHT // 5 +
+                                                                265)
+
+    entryY = tk.Entry(root, width=10)
+    entryY.place(x=WIDTH + 125, y=HEIGHT // 5 + 295)
 
     entry = tk.Entry(root, width=10)
-    entry.place(x=WIDTH + 25, y=HEIGHT // 5 + 195)
+    entry.place(x=WIDTH + 25, y=HEIGHT // 5 + 325)
 
-    btn = tk.Button(root, text="Повернуть", command=getAngle)
-    btn.place(x=WIDTH + 130, y=HEIGHT // 5 + 194)
+    btn = tk.Button(root, text="Повернуть", command=turnStar)
+    btn.place(x=WIDTH + 126, y=HEIGHT // 5 + 324)
+
+
+def goToBegin(root, star):
+    tk.Button(root, text="Вернуть исходное расположение",
+              command=star.goToBegin).place(x=WIDTH + 5, y=HEIGHT // 5 + 354)
 
 
 class Window:
@@ -111,6 +132,7 @@ class Window:
         changeScaleY(self.root, self.star)
 
         changeTurn(self.root, self.star)
+        changeTurnToPoint(self.root, self.star)
 
-    def shiftStar(self, x_shift: int, y_shift: int):
-        self.star.changeCoors(x_shift, y_shift)
+        goToBegin(self.root, self.star)
+

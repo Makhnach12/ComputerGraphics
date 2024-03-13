@@ -25,3 +25,11 @@ def getMatrixTurning(angle: float = np.pi / 3):
     return [[np.cos(angle), np.sin(angle), 0],
             [-np.sin(angle), np.cos(angle), 0],
             [0, 0, 1]]
+
+
+def getMatrixTurningToPoint(coords: (int, int), angle: float = np.pi / 3):
+    matrixCoords1 = np.array([[1, 0, 0], [0, 1, 0], [-coords[0], -coords[1],
+                                                     1]])
+    matrixCoords2 = np.array([[1, 0, 0], [0, 1, 0], [coords[0], coords[1],
+                                                     1]])
+    return matrixCoords1 @ getMatrixTurning(angle) @ matrixCoords2
