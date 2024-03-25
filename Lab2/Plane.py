@@ -189,7 +189,7 @@ class Plane:
         self.__canvas.coords(self.lines5[11], *self.dotes5[-3].coors,
                              *self.dotes5[-7].coors)
         self.__canvas.coords(self.lines5[12], *self.dotes5[-3].coors,
-                             *self.dotes5[-1].coors)
+                             * self.dotes5[-1].coors)
 
     def shiftDown(self):
         self.__changeCoors(MATRIX_DOWN)

@@ -32,3 +32,9 @@ class Dot:
     @property
     def coors(self):
         return MIDDLE[0] + self.__x, MIDDLE[1] - self.__y
+
+    @property
+    def coorsNorm(self):
+        return self.__x, self.__y
+
+

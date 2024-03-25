@@ -7,6 +7,7 @@ from Lab2.Star import Star
 
 SUM = 0
 
+
 def drawGrid(canvas, fill: str = "gray"):
     for i in range(0, WIDTH, 20):
         canvas.create_line(i, 0, i, WIDTH, fill=fill)
@@ -47,7 +48,7 @@ def changeTurn(root, star):
     def turnStar():
         angle = int(entry.get())
         entry.delete(0, tk.END)
-        star.turnStarToDot(angle, star.center)
+        star.turnStar(angle)
 
     label_above_button = tk.Label(root, text="Поворот относительно начала")
     label_above_button.place(x=WIDTH + 30, y=HEIGHT // 5 + 165)
@@ -158,11 +159,11 @@ class Window:
                                  command=self.star.shiftRight)
         right_button.place(x=WIDTH + 190, y=HEIGHT // 10 - 38)
 
-        reflectOX = tk.Button(self.root, text="симметрия OX",
+        reflectOX = tk.Button(self.root, text="симметрия OY",
                               command=self.star.reflectOX)
         reflectOX.place(x=WIDTH + 60, y=HEIGHT // 5)
 
-        reflectOY = tk.Button(self.root, text="симметрия OY",
+        reflectOY = tk.Button(self.root, text="симметрия OX",
                               command=self.star.reflectOY)
         reflectOY.place(x=WIDTH + 60, y=HEIGHT // 5 - 30)
 
