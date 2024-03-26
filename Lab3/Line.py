@@ -1,4 +1,5 @@
 from Lab2.Parameters import MATRIX_OX, MATRIX_OY, MATRIX_XY
+from Lab2.Root import CELL_SIZE
 from Lab2.dot import Dot
 
 RAD = 5
@@ -23,6 +24,13 @@ class Line:
                                                         fill='red', width=2)
         else:
             self.__changeLines()
+            if self.__rastDots:
+                for elem in self.canvasDots:
+                    self.__canvas.delete(elem)
+                self.__rastDots.clear()
+                self.canvasDots.clear()
+                self.bresenhamAlgorithm()
+                self.printDots()
 
     def __changeLines(self):
         self.__canvas.coords(self.canvasLine,
@@ -74,12 +82,12 @@ class Line:
         self.__changeCoors(MATRIX_XY)
 
     def bresenhamAlgorithm(self):
-        dx = self.__dotFn.coorsNorm[0] // 20
-        dy = self.__dotFn.coorsNorm[1] // 20
+        dx = self.__dotFn.coorsNorm[0] // CELL_SIZE
+        dy = self.__dotFn.coorsNorm[1] // CELL_SIZE
         y = 0
         error = dx / 2
-        for x in range(0, self.__dotFn.coorsNorm[0] // 20 + 1):
-            self.__rastDots.append(Dot(x * 20, y * 20))
+        for x in range(0, self.__dotFn.coorsNorm[0] // CELL_SIZE + 1):
+            self.__rastDots.append(Dot(x * CELL_SIZE, y * CELL_SIZE))
             error -= dy
             if error < 0:
                 y += 1

@@ -1,4 +1,4 @@
-from Lab3.Window import WindowLine, WindowCircle
+from Lab3.Window import WindowLine
 
-win = WindowCircle()
+win = WindowLine()
 win.root.mainloop()

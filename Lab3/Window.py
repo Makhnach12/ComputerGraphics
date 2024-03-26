@@ -1,29 +1,12 @@
 import tkinter as tk
 
 from Lab2.Parameters import WIDTH, HEIGHT
-from Lab2.Root import drawGrid, drawAxes
+from Lab2.Root import drawGrid, drawAxes, CELL_SIZE
 from Lab2.dot import Dot
 from Lab3.Circle import Circle
 from Lab3.Line import Line
 
 isLineDrown = False
-
-
-# def drawLine(line, root, canvas):
-#     label_above_button = tk.Label(root, text="Координаты начала")
-#     label_above_button.place(x=WIDTH + 60, y=HEIGHT // 10 - 10)
-#
-#     tk.Label(root, text="Координата x:").place(x=WIDTH + 60,
-#                                                y=HEIGHT // 10 + 20)
-#
-#     entryX = tk.Entry(root, width=10)
-#     entryX.place(x=WIDTH + 60, y=HEIGHT // 10 + 40)
-#
-#     tk.Label(root, text="Координата y:").place(x=WIDTH + 110,
-#                                                y=HEIGHT // 10 + 20)
-#
-#     entryY = tk.Entry(root, width=10)
-#     entryY.place(x=WIDTH + 125, y=HEIGHT // 10 + 40)
 
 
 def cleanEntry(entry: list):
@@ -67,23 +50,28 @@ class WindowCircle:
         entryY.place(x=WIDTH + 130, y=HEIGHT // 10 + 10)
 
         label_above_button = tk.Label(self.root, text="Радиус окружности")
-        label_above_button.place(x=WIDTH + 60, y=HEIGHT // 10 + 40)
+        label_above_button.place(x=WIDTH + 70, y=HEIGHT // 10 + 40)
 
         entryR = tk.Entry(self.root, width=10)
-        entryR.place(x=WIDTH + 30, y=HEIGHT // 10 + 60)
+        entryR.place(x=WIDTH + 80, y=HEIGHT // 10 + 60)
 
         createLineButton = tk.Button(self.root, text='задать окружность',
                                      command=lambda: self.circle.createCircle(
-                                         Dot(int(entryX.get()) * 20,
-                                             int(entryY.get()) * 20),
-                                         int(entryR.get()) * 20
+                                         Dot(int(entryX.get()) * CELL_SIZE,
+                                             int(entryY.get()) * CELL_SIZE),
+                                         int(entryR.get()) * CELL_SIZE
                                      ))
         cleanEntry([entryX, entryY, entryR])
-        createLineButton.place(x=WIDTH + 70, y=HEIGHT // 10 + 110)
+        createLineButton.place(x=WIDTH + 50, y=HEIGHT // 10 + 90)
 
         rastrButton = tk.Button(self.root, text="Растеризация",
                                 command=lambda: printDots(self.circle))
-        rastrButton.place(x=WIDTH + 75, y=HEIGHT // 10 + 260)
+        rastrButton.place(x=WIDTH + 65, y=HEIGHT // 10 + 120)
+
+
+def openWindowCircle():
+    win = WindowCircle()
+    win.root.mainloop()
 
 
 class WindowLine:
@@ -129,10 +117,10 @@ class WindowLine:
         entryY2.place(x=WIDTH + 130, y=HEIGHT // 10 + 80)
         createLineButton = tk.Button(self.root, text='задать прямую',
                                      command=lambda: self.line.createLine(
-                                         Dot(int(entryX.get()) * 20,
-                                             int(entryY.get()) * 20),
-                                         Dot(int(entryX2.get()) * 20,
-                                             int(entryY2.get()) * 20)
+                                         Dot(int(entryX.get()) * CELL_SIZE,
+                                             int(entryY.get()) * CELL_SIZE),
+                                         Dot(int(entryX2.get()) * CELL_SIZE,
+                                             int(entryY2.get()) * CELL_SIZE)
                                      ))
         cleanEntry([entryX, entryY2, entryX2, entryY])
         createLineButton.place(x=WIDTH + 70, y=HEIGHT // 10 + 110)
@@ -151,7 +139,7 @@ class WindowLine:
 
         offsetButton = tk.Button(self.root, text="смещение к началу",
                                  command=self.line.offsetLineToDot)
-        offsetButton.place(x=WIDTH + 75, y=HEIGHT // 10 + 230)
+        offsetButton.place(x=WIDTH + 55, y=HEIGHT // 10 + 230)
 
         rastrButton = tk.Button(self.root, text="Растеризация",
                                 command=lambda: printDots(self.line))
@@ -159,4 +147,8 @@ class WindowLine:
 
         startPos = tk.Button(self.root, text="Вернуть начальное положение",
                              command=self.line.goStartPos)
-        startPos.place(x=WIDTH + 75, y=HEIGHT // 10 + 290)
+        startPos.place(x=WIDTH + 30, y=HEIGHT // 10 + 290)
+
+        startPos = tk.Button(self.root, text="Открыть растеризацию окружности",
+                             command=openWindowCircle)
+        startPos.place(x=WIDTH + 10, y=HEIGHT // 10 + 320)

@@ -6,12 +6,13 @@ from Lab2.Propeller import Propeller
 from Lab2.Star import Star
 
 SUM = 0
+CELL_SIZE = 20
 
 
 def drawGrid(canvas, fill: str = "gray"):
-    for i in range(0, WIDTH, 20):
+    for i in range(0, WIDTH, CELL_SIZE):
         canvas.create_line(i, 0, i, WIDTH, fill=fill)
-    for i in range(0, HEIGHT, 20):
+    for i in range(0, HEIGHT, CELL_SIZE):
         canvas.create_line(0, i, HEIGHT, i, fill=fill)
 
 

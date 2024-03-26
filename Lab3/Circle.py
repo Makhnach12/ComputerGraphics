@@ -1,5 +1,22 @@
+from Lab2.Parameters import MATRIX_OY, MATRIX_OX
+from Lab2.Root import CELL_SIZE
 from Lab2.dot import Dot
 from Lab3.Line import RAD
+
+
+def addDots(arr, x, y, center):
+    dotSt = Dot(x*20, y*20)
+    arr.append(Dot(dotSt.coorsNorm[0] + center[0],
+                   dotSt.coorsNorm[1] + center[1]))
+    dotSt.multMat(MATRIX_OY)
+    arr.append(Dot(dotSt.coorsNorm[0] + center[0],
+                   dotSt.coorsNorm[1] + center[1]))
+    dotSt.multMat(MATRIX_OX)
+    arr.append(Dot(dotSt.coorsNorm[0] + center[0],
+                   dotSt.coorsNorm[1] + center[1]))
+    dotSt.multMat(MATRIX_OY)
+    arr.append(Dot(dotSt.coorsNorm[0] + center[0],
+                   dotSt.coorsNorm[1] + center[1]))
 
 
 class Circle:
@@ -29,20 +46,27 @@ class Circle:
                 self.center.coors[1] + self.radius)
         else:
             self.__changeLines()
+            if self.__rastDots:
+                for elem in self.canvasDots:
+                    self.canvas.delete(elem)
+                self.__rastDots.clear()
+                self.canvasDots.clear()
+                self.bresenhamAlgorithm()
+                self.printDots()
 
     def printDots(self):
-        for dot in self.__rastDots:
-            self.canvasDots.append(self.canvas.create_oval(dot.coors[0] - RAD,
-                                                           dot.coors[1] - RAD,
-                                                           dot.coors[0] + RAD,
-                                                           dot.coors[
-                                                               1] + RAD))
+        if not self.canvasDots:
+            for dot in self.__rastDots:
+                self.canvasDots.append(self.canvas.create_oval(dot.coors[0] - RAD,
+                                                               dot.coors[1] - RAD,
+                                                               dot.coors[0] + RAD,
+                                                               dot.coors[1] + RAD))
 
     def bresenhamAlgorithm(self):
-        x, y = self.radius // 20, 0
-        delta = 2 * (1 - self.radius // 20)
+        x, y = self.radius // CELL_SIZE, 0
+        delta = 2 * (1 - self.radius // CELL_SIZE)
         while x >= 0:
-            self.__rastDots.append(Dot(x * 20, y * 20))
+            addDots(self.__rastDots, x, y, self.center.coorsNorm)
             deltaX = 2 * delta + 2 * x - 1
             deltaY = 2 * delta - 2 * y - 1
             if delta < 0 and deltaX <= 0:
