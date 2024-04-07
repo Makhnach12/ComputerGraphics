@@ -15,6 +15,11 @@ class Line:
         self.__canvas = canvas
         self.__rastDots = []
 
+    @property
+    def dots(self):
+        return [self.__dotSt, self.__dotFn]
+
+
     def createLine(self, dotStart: Dot, dotFinish: Dot):
         self.__dotSt = dotStart
         self.__dotFn = dotFinish
@@ -110,3 +115,9 @@ class Line:
                 self.reflect()
             elif num[0] == 4:
                 self.offsetLineToDot(num[1])
+
+    def deleteLine(self):
+        self.__canvas.delete(self.canvasLine)
+        self.canvasLine = None
+        self.__dotSt = None
+        self.__dotFn = None

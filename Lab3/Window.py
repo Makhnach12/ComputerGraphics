@@ -115,7 +115,7 @@ class WindowLine:
 
         entryY2 = tk.Entry(self.root, width=10)
         entryY2.place(x=WIDTH + 130, y=HEIGHT // 10 + 80)
-        createLineButton = tk.Button(self.root, text='задать прямую',
+        createLineButton = tk.Button(self.root, text='Задать прямую',
                                      command=lambda: self.line.createLine(
                                          Dot(int(entryX.get()) * CELL_SIZE,
                                              int(entryY.get()) * CELL_SIZE),
