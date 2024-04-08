@@ -1,4 +1,4 @@
-from Lab4.Window import WindowSutherland_Cohen
+from Lab4.Window import WindowSutherland_Cohen, WindowMidDot
 
-win = WindowSutherland_Cohen()
+win = WindowMidDot()
 win.root.mainloop()

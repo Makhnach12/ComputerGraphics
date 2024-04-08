@@ -19,14 +19,13 @@ class Line:
     def dots(self):
         return [self.__dotSt, self.__dotFn]
 
-
-    def createLine(self, dotStart: Dot, dotFinish: Dot):
+    def createLine(self, dotStart: Dot, dotFinish: Dot, c='red'):
         self.__dotSt = dotStart
         self.__dotFn = dotFinish
         if self.canvasLine is None:
             self.canvasLine = self.__canvas.create_line(self.__dotSt.coors,
                                                         self.__dotFn.coors,
-                                                        fill='red', width=2)
+                                                        fill=c, width=2)
         else:
             self.__changeLines()
             if self.__rastDots:
@@ -103,7 +102,8 @@ class Line:
             self.canvasDots.append(self.__canvas.create_oval(dot.coors[0] - RAD,
                                                              dot.coors[1] - RAD,
                                                              dot.coors[0] + RAD,
-                                                             dot.coors[1] + RAD))
+                                                             dot.coors[
+                                                                 1] + RAD))
 
     def goStartPos(self):
         for num in ACTIONS:

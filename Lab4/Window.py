@@ -7,6 +7,7 @@ from Lab3.Line import Line, RAD
 from Lab3.Window import cleanEntry
 from Lab4.Polygon import Rectangle
 
+EPS = 2
 INSIDE = 0b0000
 LEFT = 0b0001
 RIGHT = 0b0010
@@ -33,7 +34,19 @@ def computeCode(dot: Dot, coorsRect):
     return code
 
 
-class WindowSutherland_Cohen:
+def checkDot(section: Dot, coorsRect):
+    if abs(section.x - coorsRect[0]) < EPS and section.x <= coorsRect[0] \
+            or \
+            abs(section.x - coorsRect[2]) < EPS and section.x >= coorsRect[2]:
+        return True
+    elif abs(section.y - coorsRect[1]) < EPS and section.y <= coorsRect[1] \
+            or \
+            abs(section.y - coorsRect[3]) < EPS and section.y >= coorsRect[3]:
+        return True
+    return False
+
+
+class Window:
     def __init__(self):
         self.intersecPoints = []
         self.intersecPointsCanvas = []
@@ -41,6 +54,7 @@ class WindowSutherland_Cohen:
         self.root = tk.Tk()
         self.root.title("LAB4_1.COM")
         self.canvas = tk.Canvas(self.root, width=WIDTH, height=HEIGHT)
+        self.polygonLine = Line(self.canvas)
         self.line = Line(self.canvas)
         drawGrid(self.canvas)
         drawAxes(self.canvas)
@@ -131,16 +145,34 @@ class WindowSutherland_Cohen:
         createLineButton.place(x=WIDTH + 70, y=HEIGHT // 10 + 300)
 
         tk.Button(self.root, text='Выделить точки ограничения',
-                  command=self.Sutherland_Cohen).place(x=WIDTH + 30,
-                                                       y=HEIGHT // 10 + 330)
+                  command=self.method).place(x=WIDTH + 30,
+                                             y=HEIGHT // 10 + 330)
         tk.Button(self.root, text='Сброс',
                   command=self.deleteAll).place(x=WIDTH + 100,
                                                 y=HEIGHT // 10 + 360)
 
+    def method(self):
+        pass
+
     def addPolygon(self, polygonType, Dots: list[Dot]):
         self.polygon = polygonType(self.canvas, Dots[0], Dots[1])
 
-    def Sutherland_Cohen(self):
+    def deleteAll(self):
+        for elem in self.intersecPointsCanvas:
+            self.canvas.delete(elem)
+        self.intersecPointsCanvas.clear()
+        self.intersecPoints.clear()
+        self.line.deleteLine()
+        self.polygonLine.deleteLine()
+        self.polygon.clearPolygon()
+        self.polygon = None
+
+
+class WindowSutherland_Cohen(Window):
+    def __init__(self):
+        super().__init__()
+
+    def method(self):
         dotsLine = self.line.dots
         x1, y1 = dotsLine[0].x, dotsLine[0].y
         x2, y2 = dotsLine[1].x, dotsLine[1].y
@@ -185,12 +217,41 @@ class WindowSutherland_Cohen:
                                                       self.intersecPoints[0]))
             self.intersecPointsCanvas.append(printDot(self.canvas,
                                                       self.intersecPoints[1]))
+            self.polygonLine.createLine(self.intersecPoints[0],
+                                        self.intersecPoints[1], c='yellow')
+
+
+class WindowMidDot(Window):
+    def __init__(self):
+        super().__init__()
+        self.lines = []
 
     def deleteAll(self):
-        for elem in self.intersecPointsCanvas:
+        super().deleteAll()
+        for elem in self.lines:
             self.canvas.delete(elem)
-        self.intersecPointsCanvas.clear()
-        self.intersecPoints.clear()
-        self.line.deleteLine()
-        self.polygon.clearPolygon()
-        self.polygon = None
+
+    def method(self):
+        def midPoint(section: tuple):
+            code1 = computeCode(section[0], self.polygon.coors)
+            code2 = computeCode(section[1], self.polygon.coors)
+            if section[0].dist(section[1]) <= 0.1 * CELL_SIZE:
+                return None
+            if code1 & code2 != 0:
+                return None
+            if code1 == 0 and code2 != 0 or code1 != 0 and code2 == 0 or \
+                    code1 != 0 and code2 != 0:
+                self.intersecPoints.append(section[0])
+                self.intersecPoints.append(section[1])
+            if code1 == 0 and code2 == 0:
+                self.lines.append(self.canvas.create_line(
+                    section[0].coors,
+                    section[1].coors,
+                    fill='yellow', width=2)
+                )
+            midPoint((section[0], (section[1] + section[0]) / 2))
+            midPoint(((section[1] + section[0]) / 2, section[1]))
+
+        midPoint(self.line.dots)
+        for point in self.intersecPoints:
+            self.intersecPointsCanvas.append(printDot(self.canvas, point))

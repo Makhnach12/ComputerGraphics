@@ -1,3 +1,5 @@
+from math import sqrt
+
 import numpy as np
 
 from Lab2.Parameters import MIDDLE
@@ -36,5 +38,18 @@ class Dot:
     @property
     def coorsNorm(self):
         return self.__x, self.__y
+
+    def __add__(self, dot):
+        return Dot(self.__x + dot.x, self.__y + dot.y)
+
+    def __truediv__(self, num: int):
+        return Dot(self.__x / num, self.__y / num)
+
+    def dist(self, dot):
+        return sqrt((dot.x - self.__x) ** 2 + (dot.y - self.__y) ** 2)
+
+    def __str__(self):
+        return f'{self.__x} {self.__y}'
+
 
 
