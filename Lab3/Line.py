@@ -19,6 +19,10 @@ class Line:
     def dots(self):
         return [self.__dotSt, self.__dotFn]
 
+    @property
+    def guidVector(self):
+        return self.__dotFn - self.__dotSt
+
     def createLine(self, dotStart: Dot, dotFinish: Dot, c='red'):
         self.__dotSt = dotStart
         self.__dotFn = dotFinish
@@ -121,3 +125,5 @@ class Line:
         self.canvasLine = None
         self.__dotSt = None
         self.__dotFn = None
+
+

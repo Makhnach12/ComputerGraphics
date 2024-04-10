@@ -1,4 +1,5 @@
 from math import sqrt
+from typing import Optional, Union
 
 import numpy as np
 
@@ -42,14 +43,26 @@ class Dot:
     def __add__(self, dot):
         return Dot(self.__x + dot.x, self.__y + dot.y)
 
+    def __eq__(self, dot):
+        if self.__x == dot.x and self.__y == dot.y:
+            return True
+        else:
+            return False
+
+    def __sub__(self, dot):
+        return Dot(self.__x - dot.x, self.__y - dot.y)
+
     def __truediv__(self, num: int):
         return Dot(self.__x / num, self.__y / num)
+
+    def __mul__(self, num: Union[int, 'Dot', float]):
+        if isinstance(num, int) or isinstance(num, float):
+            return Dot(self.__x * num, self.__y * num)
+        else:
+            return Dot(self.__x * num.x, self.__y * num.y)
 
     def dist(self, dot):
         return sqrt((dot.x - self.__x) ** 2 + (dot.y - self.__y) ** 2)
 
     def __str__(self):
         return f'{self.__x} {self.__y}'
-
-
-

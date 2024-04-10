@@ -5,7 +5,7 @@ from Lab2.Root import drawGrid, drawAxes, CELL_SIZE
 from Lab2.dot import Dot
 from Lab3.Line import Line, RAD
 from Lab3.Window import cleanEntry
-from Lab4.Polygon import Rectangle
+from Lab4.Polygon import Rectangle, Polygon
 
 EPS = 2
 INSIDE = 0b0000
@@ -13,6 +13,10 @@ LEFT = 0b0001
 RIGHT = 0b0010
 BOTTOM = 0b0100
 TOP = 0b1000
+
+
+def scalar(dot1: Dot, dot2: Dot):
+    return dot1.x * dot2.x + dot1.y * dot2.y
 
 
 def printDot(canvas, dot: Dot):
@@ -255,3 +259,133 @@ class WindowMidDot(Window):
         midPoint(self.line.dots)
         for point in self.intersecPoints:
             self.intersecPointsCanvas.append(printDot(self.canvas, point))
+
+
+class WindowCyrusBeck:
+    def __init__(self):
+        self.lines = []
+        self.intersecPoints = []
+        self.intersecPointsCanvas = []
+        self.root = tk.Tk()
+        self.root.title("LAB4_1.COM")
+        self.canvas = tk.Canvas(self.root, width=WIDTH, height=HEIGHT)
+        self.polygon = Polygon(self.canvas)
+        self.polygonLine = Line(self.canvas)
+        self.line = Line(self.canvas)
+        drawGrid(self.canvas)
+        drawAxes(self.canvas)
+        self.canvas.pack(side=tk.LEFT)
+
+        label_above_button = tk.Label(self.root, text="Координаты точки")
+        label_above_button.place(x=WIDTH + 65, y=HEIGHT // 10 + 20)
+
+        tk.Label(self.root, text="Координата x:").place(x=WIDTH + 30,
+                                                        y=HEIGHT // 10 + 50)
+
+        entryX = tk.Entry(self.root, width=10)
+        entryX.place(x=WIDTH + 30, y=HEIGHT // 10 + 80)
+
+        tk.Label(self.root, text="Координата y:").place(x=WIDTH + 130,
+                                                        y=HEIGHT // 10 + 50)
+
+        entryY = tk.Entry(self.root, width=10)
+        entryY.place(x=WIDTH + 130, y=HEIGHT // 10 + 80)
+
+        createLineButton = tk.Button(self.root, text='Задать ',
+                                     command=lambda: self.polygon.addDot(
+                                         Dot(int(entryX.get()) * CELL_SIZE,
+                                             int(entryY.get()) * CELL_SIZE))
+                                     )
+        cleanEntry([entryX, entryY])
+        createLineButton.place(x=WIDTH + 90, y=HEIGHT // 10 + 110)
+
+        label_above_button = tk.Label(self.root, text="Координаты отрезка")
+        label_above_button.place(x=WIDTH + 60, y=HEIGHT // 10 + 150)
+
+        tk.Label(self.root, text="Координата x:").place(x=WIDTH + 30,
+                                                        y=HEIGHT // 10 + 180)
+
+        entryXLine = tk.Entry(self.root, width=10)
+        entryXLine.place(x=WIDTH + 30, y=HEIGHT // 10 + 210)
+
+        tk.Label(self.root, text="Координата y:").place(x=WIDTH + 130,
+                                                        y=HEIGHT // 10 + 180)
+
+        entryYLine = tk.Entry(self.root, width=10)
+        entryYLine.place(x=WIDTH + 130, y=HEIGHT // 10 + 210)
+
+        tk.Label(self.root, text="Координата x:").place(x=WIDTH + 30,
+                                                        y=HEIGHT // 10 + 240)
+
+        entryX2Line = tk.Entry(self.root, width=10)
+        entryX2Line.place(x=WIDTH + 30, y=HEIGHT // 10 + 270)
+
+        tk.Label(self.root, text="Координата y:").place(x=WIDTH + 130,
+                                                        y=HEIGHT // 10 + 240)
+
+        entryY2Line = tk.Entry(self.root, width=10)
+        entryY2Line.place(x=WIDTH + 130, y=HEIGHT // 10 + 270)
+        createLineButton = tk.Button(self.root, text='Задать прямую',
+                                     command=lambda: self.line.createLine(
+                                         Dot(int(entryXLine.get()) * CELL_SIZE,
+                                             int(entryYLine.get()) * CELL_SIZE),
+                                         Dot(int(entryX2Line.get()) * CELL_SIZE,
+                                             int(entryY2Line.get()) * CELL_SIZE)
+                                     ))
+        cleanEntry([entryXLine, entryY2Line, entryX2Line, entryYLine])
+        createLineButton.place(x=WIDTH + 70, y=HEIGHT // 10 + 300)
+
+        tk.Button(self.root, text='Выделить точки ограничения',
+                  command=self.method).place(x=WIDTH + 30,
+                                             y=HEIGHT // 10 + 330)
+        tk.Button(self.root, text='Сброс',
+                  command=self.deleteAll).place(x=WIDTH + 100,
+                                                y=HEIGHT // 10 + 360)
+
+    def method(self):
+        vertices = self.polygon.vertices
+        guidVectorP = self.line.guidVector
+        stDot = self.line.dots[0]
+        normals = [Dot(vertices[(i + 1) % len(vertices)].y - vertices[i].y,
+                       vertices[i].x - vertices[(i + 1) % len(vertices)].x)
+                   for i in range(len(vertices))]
+        guidVectorPF = [(stDot - vertices[i]) for i in range(len(vertices))]
+        numerator = [scalar(normals[i], guidVectorPF[i])
+                     for i in range(len(vertices))]
+        denominator = [scalar(normals[i], guidVectorP)
+                       for i in range(len(vertices))]
+        for i in range(len(denominator)):
+            if denominator[i] == 0 and numerator[i] < 0:
+                return
+        t = [-numerator[i] / denominator[i]
+             if denominator[i] != 0 else 0
+             for i in range(len(vertices))]
+        tE = [t[i] for i in range(len(vertices)) if denominator[i] > 0]
+        tL = [t[i] for i in range(len(vertices)) if denominator[i] < 0]
+        tE.append(0)
+        tL.append(1)
+        temp = [max(tE), min(tL)]
+        newPair = [
+            stDot + guidVectorP * temp[0],
+            stDot + guidVectorP * temp[1]
+        ]
+        self.lines.append(self.canvas.create_line(
+            newPair[0].coors,
+            newPair[1].coors,
+            fill='yellow', width=2)
+        )
+
+    def addPolygon(self, polygonType, Dots: list[Dot]):
+        self.polygon = polygonType(self.canvas, Dots[0], Dots[1])
+
+    def deleteAll(self):
+        for elem in self.intersecPointsCanvas:
+            self.canvas.delete(elem)
+        self.intersecPointsCanvas.clear()
+        self.intersecPoints.clear()
+        self.line.deleteLine()
+        self.polygonLine.deleteLine()
+        self.polygon.clearPolygon()
+        for elem in self.lines:
+            self.canvas.delete(elem)
+        self.lines.clear()

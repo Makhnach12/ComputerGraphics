@@ -2,6 +2,13 @@ from Lab2.dot import Dot
 from Lab3.Line import RAD
 
 
+def checkerDotInList(arr: list, dot: Dot):
+    for elem in arr:
+        if elem == dot:
+            return True
+    return False
+
+
 class Polygon:
     def __init__(self, canvas):
         self.canvasDots = []
@@ -10,12 +17,13 @@ class Polygon:
         self.__canvas = canvas
 
     def addDot(self, dot: Dot):
-        if dot not in self.__dots:
+        if not checkerDotInList(self.__dots, dot):
             self.__dots.append(dot)
             self.canvasDots.append(self.__canvas.create_oval(dot.coors[0] - RAD,
                                                              dot.coors[1] - RAD,
                                                              dot.coors[0] + RAD,
-                                                             dot.coors[1] + RAD))
+                                                             dot.coors[
+                                                                 1] + RAD))
             if len(self.__dots) > 1:
                 self.canvasLines.append(self.__canvas.create_line(
                     self.__dots[len(self.__dots) - 2].coors,
@@ -41,6 +49,10 @@ class Polygon:
         for elem in self.canvasLines:
             self.__canvas.delete(elem)
         self.canvasLines.clear()
+
+    @property
+    def vertices(self):
+        return self.__dots.copy()
 
 
 class Rectangle(Polygon):
