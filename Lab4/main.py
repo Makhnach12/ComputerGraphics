@@ -1,10 +1,5 @@
-from Lab4.Window import WindowSutherland_Cohen, WindowMidDot, WindowCyrusBeck
+from Lab4.Window import WindowSutherland_Cohen, WindowMidDot, WindowCyrusBeck, \
+    StartWindow
 
-win = WindowCyrusBeck()
+win = StartWindow()
 win.root.mainloop()
-# from Lab2.dot import Dot
-#
-# a = Dot(1, 2)
-# b = Dot(1, 2)
-# c = 3
-# print(a * c)

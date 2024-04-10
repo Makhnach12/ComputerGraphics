@@ -50,13 +50,48 @@ def checkDot(section: Dot, coorsRect):
     return False
 
 
-class Window:
+def printCyrus():
+    win = WindowCyrusBeck()
+    win.root.mainloop()
+
+
+def printMid():
+    win = WindowMidDot("LAB4_2")
+    win.root.mainloop()
+
+
+def printSather():
+    win = WindowSutherland_Cohen("LAB4_3")
+    win.root.mainloop()
+
+
+class StartWindow:
     def __init__(self):
+        self.root = tk.Tk()
+        w = self.root.winfo_screenwidth()
+        h = self.root.winfo_screenheight()
+        w = w // 2  # середина экрана
+        h = h // 2
+        w = w - 200  # смещение от середины
+        h = h - 200
+        self.root.geometry(f'190x190+{w}+{h}')
+        tk.Button(self.root, text='Цирус-Бек', command=printCyrus, width=10,
+                  height=1).place(x=30, y=40)
+        tk.Button(self.root, text='Средней точки', command=printMid, width=10,
+                  height=1).place(x=30, y=70)
+        tk.Button(self.root, text='Сазерленда', command=printSather, width=10,
+                  height=1).place(x=30, y=100)
+
+        self.root.mainloop()
+
+
+class Window:
+    def __init__(self, name: str):
         self.intersecPoints = []
         self.intersecPointsCanvas = []
         self.polygon = None
         self.root = tk.Tk()
-        self.root.title("LAB4_1.COM")
+        self.root.title(name)
         self.canvas = tk.Canvas(self.root, width=WIDTH, height=HEIGHT)
         self.polygonLine = Line(self.canvas)
         self.line = Line(self.canvas)
@@ -173,8 +208,8 @@ class Window:
 
 
 class WindowSutherland_Cohen(Window):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, name: str):
+        super().__init__(name)
 
     def method(self):
         dotsLine = self.line.dots
@@ -226,8 +261,8 @@ class WindowSutherland_Cohen(Window):
 
 
 class WindowMidDot(Window):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, name: str):
+        super().__init__(name)
         self.lines = []
 
     def deleteAll(self):
@@ -267,7 +302,7 @@ class WindowCyrusBeck:
         self.intersecPoints = []
         self.intersecPointsCanvas = []
         self.root = tk.Tk()
-        self.root.title("LAB4_1.COM")
+        self.root.title("LAB4_1")
         self.canvas = tk.Canvas(self.root, width=WIDTH, height=HEIGHT)
         self.polygon = Polygon(self.canvas)
         self.polygonLine = Line(self.canvas)
@@ -291,7 +326,7 @@ class WindowCyrusBeck:
         entryY = tk.Entry(self.root, width=10)
         entryY.place(x=WIDTH + 130, y=HEIGHT // 10 + 80)
 
-        createLineButton = tk.Button(self.root, text='Задать ',
+        createLineButton = tk.Button(self.root, text='Задать',
                                      command=lambda: self.polygon.addDot(
                                          Dot(int(entryX.get()) * CELL_SIZE,
                                              int(entryY.get()) * CELL_SIZE))
@@ -374,6 +409,13 @@ class WindowCyrusBeck:
             newPair[1].coors,
             fill='yellow', width=2)
         )
+        for elemE, elemL in zip(tE, tL):
+            self.intersecPointsCanvas.append(printDot(self.canvas,
+                                                      stDot + guidVectorP *
+                                                      elemE))
+            self.intersecPointsCanvas.append(printDot(self.canvas,
+                                                      stDot + guidVectorP *
+                                                      elemL))
 
     def addPolygon(self, polygonType, Dots: list[Dot]):
         self.polygon = polygonType(self.canvas, Dots[0], Dots[1])
