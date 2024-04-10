@@ -19,10 +19,10 @@ def scalar(dot1: Dot, dot2: Dot):
     return dot1.x * dot2.x + dot1.y * dot2.y
 
 
-def printDot(canvas, dot: Dot):
+def printDot(canvas, dot: Dot, c='blue'):
     return canvas.create_oval(dot.coors[0] - RAD, dot.coors[1] - RAD,
                               dot.coors[0] + RAD, dot.coors[1] + RAD,
-                              fill='blue')
+                              fill=c)
 
 
 def computeCode(dot: Dot, coorsRect):
@@ -392,14 +392,18 @@ class WindowCyrusBeck:
         for i in range(len(denominator)):
             if denominator[i] == 0 and numerator[i] < 0:
                 return
+        print(numerator, denominator)
         t = [-numerator[i] / denominator[i]
-             if denominator[i] != 0 else 0
+             if denominator[i] != 0 and 0 <= -numerator[i] / denominator[i]<= 1
+             else 0
              for i in range(len(vertices))]
         tE = [t[i] for i in range(len(vertices)) if denominator[i] > 0]
         tL = [t[i] for i in range(len(vertices)) if denominator[i] < 0]
         tE.append(0)
         tL.append(1)
         temp = [max(tE), min(tL)]
+        if temp[0] > temp[1]:
+            return
         newPair = [
             stDot + guidVectorP * temp[0],
             stDot + guidVectorP * temp[1]
@@ -415,7 +419,7 @@ class WindowCyrusBeck:
                                                       elemE))
             self.intersecPointsCanvas.append(printDot(self.canvas,
                                                       stDot + guidVectorP *
-                                                      elemL))
+                                                      elemL, c='orange'))
 
     def addPolygon(self, polygonType, Dots: list[Dot]):
         self.polygon = polygonType(self.canvas, Dots[0], Dots[1])
