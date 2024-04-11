@@ -389,12 +389,8 @@ class WindowCyrusBeck:
                      for i in range(len(vertices))]
         denominator = [scalar(normals[i], guidVectorP)
                        for i in range(len(vertices))]
-        for i in range(len(denominator)):
-            if denominator[i] == 0 and numerator[i] < 0:
-                return
-        print(numerator, denominator)
         t = [-numerator[i] / denominator[i]
-             if denominator[i] != 0 and 0 <= -numerator[i] / denominator[i]<= 1
+             if denominator[i] != 0
              else 0
              for i in range(len(vertices))]
         tE = [t[i] for i in range(len(vertices)) if denominator[i] > 0]
@@ -402,17 +398,10 @@ class WindowCyrusBeck:
         tE.append(0)
         tL.append(1)
         temp = [max(tE), min(tL)]
-        if temp[0] > temp[1]:
-            return
         newPair = [
             stDot + guidVectorP * temp[0],
             stDot + guidVectorP * temp[1]
         ]
-        self.lines.append(self.canvas.create_line(
-            newPair[0].coors,
-            newPair[1].coors,
-            fill='yellow', width=2)
-        )
         for elemE, elemL in zip(tE, tL):
             self.intersecPointsCanvas.append(printDot(self.canvas,
                                                       stDot + guidVectorP *
@@ -420,6 +409,16 @@ class WindowCyrusBeck:
             self.intersecPointsCanvas.append(printDot(self.canvas,
                                                       stDot + guidVectorP *
                                                       elemL, c='orange'))
+        for i in range(len(denominator)):
+            if denominator[i] == 0 and numerator[i] < 0:
+                return
+        if temp[0] > temp[1]:
+            return
+        self.lines.append(self.canvas.create_line(
+            newPair[0].coors,
+            newPair[1].coors,
+            fill='yellow', width=2)
+        )
 
     def addPolygon(self, polygonType, Dots: list[Dot]):
         self.polygon = polygonType(self.canvas, Dots[0], Dots[1])
