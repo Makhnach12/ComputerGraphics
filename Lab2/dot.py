@@ -61,6 +61,9 @@ class Dot:
         else:
             return Dot(self.__x * num.x, self.__y * num.y)
 
+    def copy(self):
+        return Dot(self.__x, self.__y)
+
     def dist(self, dot):
         return sqrt((dot.x - self.__x) ** 2 + (dot.y - self.__y) ** 2)
 
