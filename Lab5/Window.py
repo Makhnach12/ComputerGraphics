@@ -3,7 +3,6 @@ import tkinter as tk
 from Lab2.Parameters import WIDTH, HEIGHT, MIDDLE
 from Lab2.Root import drawGrid, drawAxes, CELL_SIZE
 from Lab2.dot import Dot
-from Lab3.Window import cleanEntry
 from Lab4.Polygon import Polygon, checkerDotInList
 from Lab4.Window import printDot
 
@@ -69,7 +68,7 @@ class WindowFill:
                   command=lambda:
                   addInsideDot(self.stackInsideDots, self.fillDotsCanvas,
                                Dot(int(entryX.get()) * CELL_SIZE,
-                          int(entryY.get()) * CELL_SIZE), self.canvas)
+                                   int(entryY.get()) * CELL_SIZE), self.canvas)
                   ).place(x=WIDTH + 50, y=HEIGHT // 10 + 40)
 
         tk.Button(self.root, text='Закрасить',
@@ -79,6 +78,13 @@ class WindowFill:
 
     def addPolygon(self, polygonType, Dots: list[Dot]):
         self.polygon = polygonType(self.canvas, Dots[0], Dots[1])
+
+    def fillDotsPol(self, idx: int):
+        if idx == len(self.fillDots):
+            return
+        self.fillDotsCanvas.append(printDot(self.canvas, self.fillDots[idx],
+                                            c='orange'))
+        self.root.after(500, lambda: self.fillDotsPol(idx + 1))
 
     def completion(self):
         verts = self.polygon.vertices
@@ -97,8 +103,6 @@ class WindowFill:
                 print(xMax.x, xMax.y)
                 xMax.x += CELL_SIZE
             for x in range(xMin.x + CELL_SIZE, xMax.x, CELL_SIZE):
-                self.fillDotsCanvas.append(printDot(self.canvas, Dot(x, dot.y),
-                                              c='orange'))
                 self.fillDots.append(Dot(x, dot.y))
             flag = True
             for x in range(xMin.x + CELL_SIZE, xMax.x, CELL_SIZE):
@@ -124,9 +128,15 @@ class WindowFill:
                         flag = False
                 else:
                     flag = True
+        self.fillDotsPol(idx=0)
 
     def deleteAll(self):
         self.polygon.clearPolygon()
         for elem in self.lines:
             self.canvas.delete(elem)
         self.lines.clear()
+        self.stackInsideDots.clear()
+        self.fillDots.clear()
+        for elem in self.fillDotsCanvas:
+            self.canvas.delete(elem)
+        self.fillDotsCanvas.clear()

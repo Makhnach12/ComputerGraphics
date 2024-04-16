@@ -1,7 +1,6 @@
 from Lab2.Root import CELL_SIZE
 from Lab2.dot import Dot
 from Lab3.Line import RAD
-import functools
 
 
 def draw_line(start: Dot, end: Dot):
@@ -114,6 +113,7 @@ class Polygon:
         for elem in self.canvasLines:
             self.__canvas.delete(elem)
         self.canvasLines.clear()
+        self.borderDots.clear()
 
     @property
     def vertices(self):
