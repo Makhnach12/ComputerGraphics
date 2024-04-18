@@ -45,16 +45,17 @@ def printBorder(method):
     def wrapper(*args, **kwargs):
         verts = args[0].vertices
         dots = []
-        if len(verts) > 0:
-            dots = draw_line(verts[-1], args[1])
-        for elem in dots:
-            args[0].canvasDots.append(args[0].canvas.create_oval(
-                elem.coors[0] - RAD,
-                elem.coors[1] - RAD,
-                elem.coors[0] + RAD,
-                elem.coors[1] + RAD)
-            )
-            args[0].borderDots.append(elem)
+        if 'printBord' in kwargs and kwargs['printBord']:
+            if len(verts) > 0:
+                dots = draw_line(verts[-1], args[1])
+            for elem in dots:
+                args[0].canvasDots.append(args[0].canvas.create_oval(
+                    elem.coors[0] - RAD,
+                    elem.coors[1] - RAD,
+                    elem.coors[0] + RAD,
+                    elem.coors[1] + RAD)
+                )
+                args[0].borderDots.append(elem)
         return method(*args, **kwargs)
 
     return wrapper
@@ -76,7 +77,7 @@ class Polygon:
         self.__canvas = canvas
 
     @printBorder
-    def addDot(self, dot: Dot):
+    def addDot(self, dot: Dot, printBord=False):
         if not checkerDotInList(self.__dots, dot):
             self.__dots.append(dot)
             self.canvasDots.append(self.__canvas.create_oval(dot.coors[0] - RAD,

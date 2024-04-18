@@ -40,17 +40,18 @@ class WindowFill:
             if abs(abs(normY / 20) - abs(yCell)) > 0.5:
                 yCell += 1
             if abs(abs(normX // 20) - abs(normX / 20)) < EPS:
-                self.polygon.addDot(Dot(xCell * CELL_SIZE, yCell * CELL_SIZE))
+                self.polygon.addDot(Dot(xCell * CELL_SIZE, yCell * CELL_SIZE),
+                                    printBord=True)
 
         self.canvas.bind('<Button-1>', click)
         tk.Button(self.root, text='Сброс', command=self.deleteAll).place(
-            x=WIDTH + 65,
+            x=WIDTH + 90,
             y=HEIGHT // 10 + 100
         )
 
         label_above_button = tk.Label(self.root, text="Координаты внутренней "
                                                       "точки")
-        label_above_button.place(x=WIDTH + 20, y=HEIGHT // 10 - 30)
+        label_above_button.place(x=WIDTH + 27, y=HEIGHT // 10 - 30)
 
         tk.Label(self.root, text="Координата x:").place(x=WIDTH + 30,
                                                         y=HEIGHT // 10 - 10)
@@ -69,12 +70,12 @@ class WindowFill:
                   addInsideDot(self.stackInsideDots, self.fillDotsCanvas,
                                Dot(int(entryX.get()) * CELL_SIZE,
                                    int(entryY.get()) * CELL_SIZE), self.canvas)
-                  ).place(x=WIDTH + 50, y=HEIGHT // 10 + 40)
+                  ).place(x=WIDTH + 70, y=HEIGHT // 10 + 40)
 
         tk.Button(self.root, text='Закрасить',
                   command=lambda:
                   self.completion()
-                  ).place(x=WIDTH + 50, y=HEIGHT // 10 + 70)
+                  ).place(x=WIDTH + 77, y=HEIGHT // 10 + 70)
 
     def addPolygon(self, polygonType, Dots: list[Dot]):
         self.polygon = polygonType(self.canvas, Dots[0], Dots[1])
