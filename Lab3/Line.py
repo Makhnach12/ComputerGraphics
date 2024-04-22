@@ -7,7 +7,7 @@ ACTIONS = []
 
 
 class Line:
-    def __init__(self, canvas):
+    def __init__(self, canvas=None):
         self.canvasLine = None
         self.canvasDots = []
         self.__dotSt = None
@@ -19,6 +19,11 @@ class Line:
     def dots(self):
         return [self.__dotSt, self.__dotFn]
 
+    def getLineCoef(self):
+        return self.__dotSt.y - self.__dotFn.y, \
+               self.__dotFn.x - self.__dotSt.x, \
+               self.__dotSt.x * self.__dotFn.y - self.__dotSt.y * self.__dotFn.x
+
     @property
     def guidVector(self):
         return self.__dotFn - self.__dotSt
@@ -26,6 +31,8 @@ class Line:
     def createLine(self, dotStart: Dot, dotFinish: Dot, c='red'):
         self.__dotSt = dotStart
         self.__dotFn = dotFinish
+        if self.__canvas is None:
+            return
         if self.canvasLine is None:
             self.canvasLine = self.__canvas.create_line(self.__dotSt.coors,
                                                         self.__dotFn.coors,
@@ -125,5 +132,3 @@ class Line:
         self.canvasLine = None
         self.__dotSt = None
         self.__dotFn = None
-
-
