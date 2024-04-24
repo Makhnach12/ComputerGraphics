@@ -21,7 +21,8 @@ def orientation(a: Dot, b: Dot, c: Dot):
 class WindowHullMethod:
     def __init__(self):
         self.dots = []
-        self.borderDots = []
+        self.Lines = []
+        self.interLines = []
         self.dotsCanvas = []
         self.root = tk.Tk()
         self.root.title("LAB6")
@@ -91,12 +92,23 @@ class WindowHullMethod:
                     if dots[j] not in borderDots:
                         middle += dots[j]
                         borderDots.append(dots[j])
-                    self.canvas.create_line(dots[i].coors,
-                                            dots[j].coors,
-                                            width=2)
+                    self.interLines.append({'stDot': dots[i],
+                                            'finDot': dots[j],
+                                            'color': 'white'})
         middle /= len(borderDots)
         borderDots = sorted(borderDots, key=cmp_to_key(comparatorDots))
         return borderDots
+
+    def animLine(self, idx: int):
+        if idx == len(self.interLines):
+            return
+        if idx - 1 >= 0 and self.interLines[idx - 1]['color'] == 'green':
+            self.canvas.delete(self.Lines[idx - 1])
+        self.Lines.append(self.canvas.create_line(
+            self.interLines[idx]['stDot'].coors,
+            self.interLines[idx]['finDot'].coors,
+            fill=self.interLines[idx]['color'], width=2))
+        self.root.after(500, lambda: self.animLine(idx + 1))
 
     def merger(self, leftFigure, rightFigure):
         idxLeft, idxRight = 0, 0
@@ -116,11 +128,20 @@ class WindowHullMethod:
                               leftFigure[upperLeft],
                               leftFigure[(upperLeft - 1) % lenLeft]) >= 0:
                 upperLeft = (upperLeft - 1) % lenLeft
+                self.interLines.append({'stDot': leftFigure[upperLeft],
+                                        'finDot': rightFigure[upperRight],
+                                        'color': 'green'})
             while orientation(leftFigure[upperLeft], rightFigure[upperRight],
                               rightFigure[(upperRight + 1) % lenRight]) <= 0:
                 upperRight = (upperRight + 1) % lenRight
+                self.interLines.append({'stDot': leftFigure[upperLeft],
+                                        'finDot': rightFigure[upperRight],
+                                        'color': 'green'})
                 done = False
         downLeft, downRight = idxLeft, idxRight
+        self.interLines.append({'stDot': leftFigure[upperLeft],
+                                'finDot': rightFigure[upperRight],
+                                'color': 'red'})
         done = False
         while not done:
             done = True
@@ -128,9 +149,15 @@ class WindowHullMethod:
                               leftFigure[downLeft],
                               leftFigure[(downLeft + 1) % lenLeft]) <= 0:
                 downLeft = (downLeft + 1) % lenLeft
+                self.interLines.append({'stDot': leftFigure[downLeft],
+                                        'finDot': rightFigure[downRight],
+                                        'color': 'green'})
             while orientation(leftFigure[downLeft], rightFigure[downRight],
                               rightFigure[(downRight - 1) % lenRight]) >= 0:
                 downRight = (downRight - 1) % lenRight
+                self.interLines.append({'stDot': leftFigure[downLeft],
+                                        'finDot': rightFigure[downRight],
+                                        'color': 'green'})
                 done = False
         newFigure = []
         i = upperRight
@@ -145,22 +172,16 @@ class WindowHullMethod:
             i += 1
         else:
             newFigure.append(leftFigure[upperLeft])
-        self.canvas.create_line(leftFigure[upperLeft].coors,
-                                rightFigure[upperRight].coors,
-                                width=2, fill='red')
-        self.canvas.create_line(leftFigure[downLeft].coors,
-                                rightFigure[downRight].coors,
-                                width=2, fill='red')
-        print('Длина фигуры', len(newFigure))
-        for elem in newFigure:
-            print(elem)
+        self.interLines.append({'stDot': leftFigure[downLeft],
+                                'finDot': rightFigure[downRight],
+                                'color': 'red'})
         return newFigure
 
     def divide(self, dots):
         if len(dots) <= 5:
             return self.bruteHull(dots)
         left, right = [], []
-        start = int(len(dots) / 2)
+        start = len(dots) // 2
         for i in range(start):
             left.append(dots[i])
         for i in range(start, len(dots)):
@@ -179,10 +200,23 @@ class WindowHullMethod:
                 return 0
 
         self.dots = sorted(self.dots, key=cmp_to_key(comparatorDots))
-        self.divide(self.dots)
+        finalFig = self.divide(self.dots)
+        for i in range(len(finalFig) - 1):
+            self.interLines.append({'stDot': finalFig[i],
+                                    'finDot': finalFig[i + 1],
+                                    'color': 'yellow'})
+        else:
+            self.interLines.append({'stDot': finalFig[-1],
+                                    'finDot': finalFig[0],
+                                    'color': 'yellow'})
+        self.animLine(0)
 
     def deleteAll(self):
         for elem in self.dotsCanvas:
             self.canvas.delete(elem)
+        for elem in self.Lines:
+            self.canvas.delete(elem)
         self.dotsCanvas.clear()
         self.dots.clear()
+        self.Lines.clear()
+        self.interLines.clear()
