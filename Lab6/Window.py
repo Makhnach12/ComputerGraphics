@@ -8,6 +8,16 @@ from Lab3.Line import Line
 from Lab4.Window import printDot, EPS
 from functools import cmp_to_key
 
+SIGNS = {'>=': lambda elem: elem[0] >= elem[1],
+         '<=': lambda elem: elem[0] <= elem[1]}
+
+
+def orientationAllDots(a: Dot, b: Dot, arr: list, sign):
+    for elem in arr:
+        if not SIGNS[sign]([orientation(a, b, elem), 0]):
+            return False
+    return True
+
 
 def orientation(a: Dot, b: Dot, c: Dot):
     res = (b.y - a.y) * (c.x - b.x) - (c.y - b.y) * (b.x - a.x)
@@ -101,6 +111,9 @@ class WindowHullMethod:
 
     def animLine(self, idx: int):
         if idx == len(self.interLines):
+            for i in range(len(self.interLines)):
+                if self.interLines[i]['color'] != 'yellow':
+                    self.canvas.delete(self.Lines[i])
             return
         if idx - 1 >= 0 and self.interLines[idx - 1]['color'] == 'green':
             self.canvas.delete(self.Lines[idx - 1])
@@ -122,17 +135,21 @@ class WindowHullMethod:
         lenLeft, lenRight = len(leftFigure), len(rightFigure)
         upperLeft, upperRight = idxLeft, idxRight
         done = False
+        self.interLines.append({'stDot': leftFigure[upperLeft],
+                                'finDot': rightFigure[upperRight],
+                                'color': 'green'})
         while not done:
             done = True
-            while orientation(rightFigure[upperRight],
-                              leftFigure[upperLeft],
-                              leftFigure[(upperLeft - 1) % lenLeft]) >= 0:
+            while not orientationAllDots(rightFigure[upperRight],
+                                         leftFigure[upperLeft], leftFigure,
+                                         '<='):
                 upperLeft = (upperLeft - 1) % lenLeft
                 self.interLines.append({'stDot': leftFigure[upperLeft],
                                         'finDot': rightFigure[upperRight],
                                         'color': 'green'})
-            while orientation(leftFigure[upperLeft], rightFigure[upperRight],
-                              rightFigure[(upperRight + 1) % lenRight]) <= 0:
+            while not orientationAllDots(leftFigure[upperLeft],
+                                         rightFigure[upperRight],
+                                         rightFigure, '>='):
                 upperRight = (upperRight + 1) % lenRight
                 self.interLines.append({'stDot': leftFigure[upperLeft],
                                         'finDot': rightFigure[upperRight],
@@ -145,15 +162,16 @@ class WindowHullMethod:
         done = False
         while not done:
             done = True
-            while orientation(rightFigure[downRight],
-                              leftFigure[downLeft],
-                              leftFigure[(downLeft + 1) % lenLeft]) <= 0:
+            while not orientationAllDots(rightFigure[downRight],
+                                         leftFigure[downLeft],
+                                         leftFigure, '>='):
                 downLeft = (downLeft + 1) % lenLeft
                 self.interLines.append({'stDot': leftFigure[downLeft],
                                         'finDot': rightFigure[downRight],
                                         'color': 'green'})
-            while orientation(leftFigure[downLeft], rightFigure[downRight],
-                              rightFigure[(downRight - 1) % lenRight]) >= 0:
+            while not orientationAllDots(leftFigure[downLeft],
+                                     rightFigure[downRight],
+                                     rightFigure, '<='):
                 downRight = (downRight - 1) % lenRight
                 self.interLines.append({'stDot': leftFigure[downLeft],
                                         'finDot': rightFigure[downRight],
@@ -165,13 +183,28 @@ class WindowHullMethod:
             newFigure.append(rightFigure[i % len(rightFigure)])
             i += 1
         else:
-            newFigure.append(rightFigure[downRight])
+            if upperRight % len(rightFigure) == downRight:
+                newFigure.append(rightFigure[i % len(rightFigure)])
+                i += 1
+                while i % len(rightFigure) != downRight:
+                    newFigure.append(rightFigure[i % len(rightFigure)])
+                    i += 1
+            else:
+                newFigure.append(rightFigure[downRight])
+
         i = downLeft
         while i % len(leftFigure) != upperLeft:
             newFigure.append(leftFigure[i % len(leftFigure)])
             i += 1
         else:
-            newFigure.append(leftFigure[upperLeft])
+            if downLeft % len(leftFigure) == upperLeft:
+                newFigure.append(leftFigure[i % len(leftFigure)])
+                i += 1
+                while i % len(leftFigure) != upperLeft:
+                    newFigure.append(leftFigure[i % len(leftFigure)])
+                    i += 1
+            else:
+                newFigure.append(leftFigure[upperLeft])
         self.interLines.append({'stDot': leftFigure[downLeft],
                                 'finDot': rightFigure[downRight],
                                 'color': 'red'})

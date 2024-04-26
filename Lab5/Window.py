@@ -90,33 +90,20 @@ class WindowFill:
     def completion(self):
         verts = self.polygon.vertices
         while len(self.stackInsideDots):
-            dot: Dot = self.stackInsideDots.pop()
+            dot: Dot = self.stackInsideDots.pop(0)
             xMin = dot.copy()
             while not checkerDotInList(verts, xMin) and \
                     not checkerDotInList(self.polygon.borderDots, xMin):
-                print(len(self.stackInsideDots))
-                print(xMin.x, xMin.y)
                 xMin.x -= CELL_SIZE
             xMax = dot.copy()
             while not checkerDotInList(verts, xMax) and \
                     not checkerDotInList(self.polygon.borderDots, xMax):
-                print(len(self.stackInsideDots))
-                print(xMax.x, xMax.y)
                 xMax.x += CELL_SIZE
-            for x in range(xMin.x + CELL_SIZE, xMax.x, CELL_SIZE):
+            for x in range(dot.x, xMax.x, CELL_SIZE):
                 self.fillDots.append(Dot(x, dot.y))
-            flag = True
-            for x in range(xMin.x + CELL_SIZE, xMax.x, CELL_SIZE):
-                if not checkerDotInList(verts, Dot(x, dot.y - CELL_SIZE)) and \
-                        not checkerDotInList(self.fillDots,
-                                             Dot(x, dot.y - CELL_SIZE)) and \
-                        not checkerDotInList(self.polygon.borderDots,
-                                             Dot(x, dot.y - CELL_SIZE)):
-                    if flag:
-                        self.stackInsideDots.append(Dot(x, dot.y - CELL_SIZE))
-                        flag = False
-                else:
-                    flag = True
+            for x in range(dot.x - CELL_SIZE, xMin.x, -CELL_SIZE):
+                self.fillDots.append(Dot(x, dot.y))
+
             flag = True
             for x in range(xMin.x + CELL_SIZE, xMax.x, CELL_SIZE):
                 if not checkerDotInList(verts, Dot(x, dot.y + CELL_SIZE)) and \
@@ -126,6 +113,18 @@ class WindowFill:
                                              Dot(x, dot.y + CELL_SIZE)):
                     if flag:
                         self.stackInsideDots.append(Dot(x, dot.y + CELL_SIZE))
+                        flag = False
+                else:
+                    flag = True
+            flag = True
+            for x in range(xMin.x + CELL_SIZE, xMax.x, CELL_SIZE):
+                if not checkerDotInList(verts, Dot(x, dot.y - CELL_SIZE)) and \
+                        not checkerDotInList(self.fillDots,
+                                             Dot(x, dot.y - CELL_SIZE)) and \
+                        not checkerDotInList(self.polygon.borderDots,
+                                             Dot(x, dot.y - CELL_SIZE)):
+                    if flag:
+                        self.stackInsideDots.append(Dot(x, dot.y - CELL_SIZE))
                         flag = False
                 else:
                     flag = True
