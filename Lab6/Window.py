@@ -52,10 +52,11 @@ class WindowHullMethod:
             if abs(abs(normY / CELL_SIZE) - abs(yCell)) > 0.5:
                 yCell += 1
             if abs(abs(normX // CELL_SIZE) - abs(normX / CELL_SIZE)) < EPS:
-                self.dots.append(Dot(xCell * CELL_SIZE, yCell * CELL_SIZE))
-                self.dotsCanvas.append(
-                    printDot(self.canvas, self.dots[-1], c='blue')
-                )
+                if Dot(xCell * CELL_SIZE, yCell * CELL_SIZE) not in self.dots:
+                    self.dots.append(Dot(xCell * CELL_SIZE, yCell * CELL_SIZE))
+                    self.dotsCanvas.append(
+                        printDot(self.canvas, self.dots[-1], c='blue')
+                    )
 
         self.canvas.bind('<Button-1>', click)
         tk.Button(self.root, text='Сброс', command=self.deleteAll).place(
@@ -131,7 +132,6 @@ class WindowHullMethod:
         for i in range(0, len(rightFigure)):
             if rightFigure[i].x < rightFigure[idxRight].x:
                 idxRight = i
-
         lenLeft, lenRight = len(leftFigure), len(rightFigure)
         upperLeft, upperRight = idxLeft, idxRight
         done = False
@@ -170,8 +170,8 @@ class WindowHullMethod:
                                         'finDot': rightFigure[downRight],
                                         'color': 'green'})
             while not orientationAllDots(leftFigure[downLeft],
-                                     rightFigure[downRight],
-                                     rightFigure, '<='):
+                                         rightFigure[downRight],
+                                         rightFigure, '<='):
                 downRight = (downRight - 1) % lenRight
                 self.interLines.append({'stDot': leftFigure[downLeft],
                                         'finDot': rightFigure[downRight],
@@ -186,7 +186,10 @@ class WindowHullMethod:
             if upperRight % len(rightFigure) == downRight:
                 newFigure.append(rightFigure[i % len(rightFigure)])
                 i += 1
-                while i % len(rightFigure) != downRight:
+                while i % len(rightFigure) != downRight and \
+                        orientation(leftFigure[upperLeft],
+                                    rightFigure[upperRight],
+                                    rightFigure[i % len(rightFigure)]) == 0:
                     newFigure.append(rightFigure[i % len(rightFigure)])
                     i += 1
             else:
@@ -200,7 +203,9 @@ class WindowHullMethod:
             if downLeft % len(leftFigure) == upperLeft:
                 newFigure.append(leftFigure[i % len(leftFigure)])
                 i += 1
-                while i % len(leftFigure) != upperLeft:
+                while i % len(leftFigure) != upperLeft and \
+                        orientation(rightFigure[downRight], leftFigure[downLeft],
+                                    leftFigure[i % len(leftFigure)]) == 0:
                     newFigure.append(leftFigure[i % len(leftFigure)])
                     i += 1
             else:
@@ -211,16 +216,12 @@ class WindowHullMethod:
         return newFigure
 
     def divide(self, dots):
-        if len(dots) <= 5:
+        if len(dots) <= 3:
             return self.bruteHull(dots)
-        left, right = [], []
         start = len(dots) // 2
-        for i in range(start):
-            left.append(dots[i])
-        for i in range(start, len(dots)):
-            right.append(dots[i])
-        left_hull = self.divide(left)
-        right_hull = self.divide(right)
+        left, right = [dots[i] for i in range(start)], \
+            [dots[i] for i in range(start, len(dots))]
+        left_hull, right_hull = self.divide(left), self.divide(right)
         return self.merger(left_hull, right_hull)
 
     def startDivide(self):
@@ -230,6 +231,10 @@ class WindowHullMethod:
             elif dot1.x - dot2.x < 0:
                 return -1
             else:
+                if dot1.y - dot2.y > 0:
+                    return 1
+                elif dot1.y - dot2.y < 0:
+                    return -1
                 return 0
 
         self.dots = sorted(self.dots, key=cmp_to_key(comparatorDots))
