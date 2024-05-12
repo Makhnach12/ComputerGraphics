@@ -69,3 +69,6 @@ class Dot:
 
     def __str__(self):
         return f'{self.__x} {self.__y}'
+
+    def __hash__(self):
+        return hash(Dot.__str__(self))

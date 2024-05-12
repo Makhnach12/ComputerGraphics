@@ -19,7 +19,8 @@ int main(){
 //    Line* lin2 = newLine(a, -b, c);
 //    lin1 -> findPointIntersec(*lin2, dot);
 //    std::cout << isRayIntersectSegment(dotA, dotB, dotC, dotD);
-    double* arr = analyzeTriangle(dotA, dotB, dotC);
-    std::cout << arr[0] << ' ' << arr[1] << ' ' << arr[2];
+    std::cout << getAngle(dotA, dotC, dotB) << '\n';
+//    double* arr = analyzeTriangle(dotA, dotB, dotC);
+//    std::cout << arr[0] << ' ' << arr[1] << ' ' << arr[2];
     return 0;
 }

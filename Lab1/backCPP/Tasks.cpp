@@ -38,6 +38,10 @@ bool analyzeDots(Dot3D* dot1, Dot3D* dot2, Dot3D* dot3){
     return false;
 }
 
+double getAngle(Dot3D* dot1, Dot3D* dot2, Dot3D* dot3){
+    return unfoldedAngle / PI * findAngle3D(*dot1, *dot2, *dot3);
+}
+
 double* analyzeTriangle(Dot3D* A, Dot3D* B, Dot3D* C){
     double* arrAns = new double[3];
     arrAns[0] = giveHeight(distance3D(*A, *B), distance3D(*A, *C), distance3D(*B, *C));

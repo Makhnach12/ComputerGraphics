@@ -28,6 +28,52 @@ def orientation(a: Dot, b: Dot, c: Dot):
     return -1
 
 
+def bruteHull(dots: list[Dot], polygonLines: list[dict] = None) -> list[Dot]:
+    middle = Dot(0, 0)
+
+    def comparatorDots(dot1: Dot, dot2: Dot):
+        """Sorting by the hour"""
+        angle1 = (math.atan2(*(dot1 - middle).coorsNorm)) * 180 / 3.14
+        angle2 = (math.atan2(*(dot2 - middle).coorsNorm)) * 180 / 3.14
+        if angle1 - angle2 > 0:
+            return 1
+        elif angle1 - angle2 < 0:
+            return -1
+        else:
+            return 0
+
+    borderDots = []
+    for i in range(len(dots)):
+        for j in range(i + 1, len(dots)):
+            ln = Line()
+            ln.createLine(dots[i], dots[j])
+            a, b, c = ln.getLineCoef()
+            pos, neg = 0, 0
+            for k in range(len(dots)):
+                if (k == i) or (k == j) or (
+                        a * dots[k].x + b * dots[k].y + c <= 0):
+                    neg += 1
+                if (k == i) or (k == j) or (
+                        a * dots[k].x + b * dots[k].y + c >= 0):
+                    pos += 1
+            if pos == len(dots) or neg == len(dots):
+                if dots[i] not in borderDots:
+                    middle += dots[i]
+                    borderDots.append(dots[i])
+                if dots[j] not in borderDots:
+                    middle += dots[j]
+                    borderDots.append(dots[j])
+                if polygonLines is not None:
+                    polygonLines.append(
+                        {'stDot': dots[i],
+                         'finDot': dots[j],
+                         'color': 'white'}
+                    )
+    middle /= len(borderDots)
+    borderDots = sorted(borderDots, key=cmp_to_key(comparatorDots))
+    return borderDots
+
+
 class WindowHullMethod:
     def __init__(self):
         self.dots = []
@@ -52,11 +98,16 @@ class WindowHullMethod:
             if abs(abs(normY / CELL_SIZE) - abs(yCell)) > 0.5:
                 yCell += 1
             if abs(abs(normX // CELL_SIZE) - abs(normX / CELL_SIZE)) < EPS:
-                if Dot(xCell * CELL_SIZE, yCell * CELL_SIZE) not in self.dots:
-                    self.dots.append(Dot(xCell * CELL_SIZE, yCell * CELL_SIZE))
+                dot = Dot(xCell * CELL_SIZE, yCell * CELL_SIZE)
+                if dot not in self.dots:
+                    self.dots.append(dot)
                     self.dotsCanvas.append(
                         printDot(self.canvas, self.dots[-1], c='blue')
                     )
+                    # TODO: delete dot
+                # else:
+                #     self.canvas.delete(self.dotsCanvas[self.dots.index(dot)])
+                #     self.dots.remove(dot)
 
         self.canvas.bind('<Button-1>', click)
         tk.Button(self.root, text='Сброс', command=self.deleteAll).place(
@@ -68,47 +119,6 @@ class WindowHullMethod:
             x=WIDTH + 90,
             y=HEIGHT // 10 + 149
         )
-
-    def bruteHull(self, dots: list[Dot]):
-        middle = Dot(0, 0)
-
-        def comparatorDots(dot1: Dot, dot2: Dot):
-            angle1 = (math.atan2(*(dot1 - middle).coorsNorm)) * 180 / 3.14
-            angle2 = (math.atan2(*(dot2 - middle).coorsNorm)) * 180 / 3.14
-            if angle1 - angle2 > 0:
-                return 1
-            elif angle1 - angle2 < 0:
-                return -1
-            else:
-                return 0
-
-        borderDots = []
-        for i in range(len(dots)):
-            for j in range(i + 1, len(dots)):
-                ln = Line()
-                ln.createLine(dots[i], dots[j])
-                a, b, c = ln.getLineCoef()
-                pos, neg = 0, 0
-                for k in range(len(dots)):
-                    if (k == i) or (k == j) or (
-                            a * dots[k].x + b * dots[k].y + c <= 0):
-                        neg += 1
-                    if (k == i) or (k == j) or (
-                            a * dots[k].x + b * dots[k].y + c >= 0):
-                        pos += 1
-                if pos == len(dots) or neg == len(dots):
-                    if dots[i] not in borderDots:
-                        middle += dots[i]
-                        borderDots.append(dots[i])
-                    if dots[j] not in borderDots:
-                        middle += dots[j]
-                        borderDots.append(dots[j])
-                    self.interLines.append({'stDot': dots[i],
-                                            'finDot': dots[j],
-                                            'color': 'white'})
-        middle /= len(borderDots)
-        borderDots = sorted(borderDots, key=cmp_to_key(comparatorDots))
-        return borderDots
 
     def animLine(self, idx: int):
         if idx == len(self.interLines):
@@ -204,7 +214,8 @@ class WindowHullMethod:
                 newFigure.append(leftFigure[i % len(leftFigure)])
                 i += 1
                 while i % len(leftFigure) != upperLeft and \
-                        orientation(rightFigure[downRight], leftFigure[downLeft],
+                        orientation(rightFigure[downRight],
+                                    leftFigure[downLeft],
                                     leftFigure[i % len(leftFigure)]) == 0:
                     newFigure.append(leftFigure[i % len(leftFigure)])
                     i += 1
@@ -217,7 +228,7 @@ class WindowHullMethod:
 
     def divide(self, dots):
         if len(dots) <= 3:
-            return self.bruteHull(dots)
+            return bruteHull(dots, self.interLines)
         start = len(dots) // 2
         left, right = [dots[i] for i in range(start)], \
             [dots[i] for i in range(start, len(dots))]

@@ -1,5 +1,7 @@
 import ctypes
 
+from Lab2.dot import Dot
+
 task = ctypes.CDLL('tasks.so')
 line = ctypes.CDLL('line.so')
 ctypes.cdll.LoadLibrary('operations.so')
@@ -64,7 +66,7 @@ def analyzeDots(dotA: tuple[float, ...], dotB: tuple[float, ...],
 
 
 def analyzeTriangle(dotA: tuple[float, ...], dotB: tuple[float, ...],
-    dotC: tuple[float, ...]) -> list[float]:
+                    dotC: tuple[float, ...]) -> list[float]:
     line.newDot3D.restype = ctypes.c_void_p
     line.newDot3D.argtypes = [ctypes.c_double, ctypes.c_double, ctypes.c_double]
 
@@ -80,3 +82,17 @@ def analyzeTriangle(dotA: tuple[float, ...], dotB: tuple[float, ...],
     result = [round(value, 5) for value in resultPtr.contents]
     return result
 
+
+def getAngle(dotA: Dot, dotB: Dot, dotC: Dot) -> float:
+    line.newDot3D.restype = ctypes.c_void_p
+    line.newDot3D.argtypes = [ctypes.c_double, ctypes.c_double, ctypes.c_double]
+
+    dotA = line.newDot3D(dotA.x, dotA.y, 0)
+    dotB = line.newDot3D(dotB.x, dotB.y, 0)
+    dotC = line.newDot3D(dotC.x, dotC.y, 0)
+
+    task.getAngle.restype = ctypes.c_double
+    task.getAngle.argtypes = [ctypes.c_void_p, ctypes.c_void_p,
+                              ctypes.c_void_p]
+
+    return task.getAngle(dotA, dotB, dotC)

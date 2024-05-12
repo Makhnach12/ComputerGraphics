@@ -19,6 +19,8 @@ extern "C" {
     bool analyzeDots(Dot3D* dot1, Dot3D* dot2, Dot3D* dot3);
 
     double* analyzeTriangle(Dot3D* A, Dot3D* B, Dot3D* C);
+
+    double getAngle(Dot3D* dot1, Dot3D* dot2, Dot3D* dot3);
 #ifdef __cplusplus
 }
 #endif
