@@ -31,13 +31,65 @@ def checkTriangles(tr1: Triangle, tr2: Triangle) -> bool:
     return min1 > min2
 
 
+def sinA(a: Dot, b: Dot, c: Dot):
+    dots = bruteHull([a, b, c])
+    midDotInd = dots.index(b)
+    newB, newC, newA = dots[midDotInd], dots[(midDotInd + 1) % len(dots)], \
+        dots[(midDotInd + 2) % len(dots)]
+    vectorBA: Dot = newA - newB
+    vectorBC: Dot = newC - newB
+    vectorComp: float = vectorBA.x * vectorBC.y - vectorBA.y * vectorBC.x
+    return vectorComp / (math.sqrt(vectorBA.x ** 2 + vectorBA.y ** 2) *
+                         math.sqrt(vectorBC.x ** 2 + vectorBC.y ** 2))
+
+
 def checkDelone(p1: Dot, p2: Dot, p3: Dot, p0: Dot) -> bool:
-    """Векторное произведение"""
-    cos_a = (p0.x - p1.x) * (p0.x - p3.x) + (p0.y - p1.y) * (p0.y - p3.y)
-    cos_b = (p2.x - p1.x) * (p2.x - p3.x) + (p2.y - p1.y) * (p2.y - p3.y)
-    sin_a = (p0.x - p1.x) * (p0.y - p3.y) - (p0.x - p3.x) * (p0.y - p1.y)
-    sin_b = (p2.x - p1.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p2.y - p1.y)
-    return sin_a * cos_b + cos_a * sin_b >= 0
+    middle = Dot(0, 0)
+
+    def comparatorDots(dot1: Dot, dot2: Dot):
+        """Sorting by the hour"""
+        angle1 = (math.atan2(*(dot1 - middle).coorsNorm)) * 180 / 3.14
+        angle2 = (math.atan2(*(dot2 - middle).coorsNorm)) * 180 / 3.14
+        if angle1 - angle2 > 0:
+            return 1
+        elif angle1 - angle2 < 0:
+            return -1
+        else:
+            return 0
+
+    for elem in [p0, p1, p2, p3]:
+        middle += elem
+    middle /= 4
+    polygon = sorted([p0, p1, p2, p3], key=cmp_to_key(comparatorDots))
+    # s_a = (p0.x - p1.x) * (p0.x - p3.x) + (p0.y - p1.y) * (p0.y - p3.y)
+    # s_b = (p2.x - p1.x) * (p2.x - p3.x) + (p2.y - p1.y) * (p2.y - p3.y)
+    # if s_a < 0 and s_b < 0:
+    #     return False
+    # elif s_a >= 0 and s_b >= 0:
+    #     return True
+    hull = bruteHull([p0, p1, p2, p3])
+    if len(hull) == 3 and p0 not in hull:
+        return False
+    midDotIndA = polygon.index(p0)
+    angleA = [polygon[(midDotIndA - 1) % len(polygon)], polygon[midDotIndA],
+              polygon[(midDotIndA + 1) % len(polygon)]]
+    sin_a = sinA(*angleA)
+    angleRadA = math.asin(sin_a)
+    # if (angleA[1].x - angleA[0].x) * (angleA[1].x - angleA[2].x) + \
+    #     (angleA[1].y - angleA[0].y) * (angleA[1].y - angleA[2].y) < 0:
+    #     angleRadA += math.pi / 2
+    # cos_a = sqrt(1 - sin_a * sin_a)
+    midDotIndB = polygon.index([elem for elem in polygon
+                                if elem not in angleA][0])
+    angleB = [polygon[(midDotIndB - 1) % len(polygon)], polygon[midDotIndB],
+              polygon[(midDotIndB + 1) % len(polygon)]]
+    sin_b = sinA(*angleB)
+    angleRadB = math.asin(sin_b)
+    # if (angleB[1].x - angleB[0].x) * (angleB[1].x - angleB[2].x) + \
+    #     (angleB[1].y - angleB[0].y) * (angleB[1].y - angleB[2].y) < 0:
+    #     angleRadB += math.pi / 2
+    # cos_b = sqrt(1 - sin_b * sin_b)
+    return angleRadA + angleRadB - math.pi < 0
 
 
 def orientationAllDots(a: Dot, b: Dot, arr: list, sign):
@@ -199,17 +251,20 @@ class WindowTriangulation:
                                  upRibIdx: tuple[int, int],
                                  downRibIdx: tuple[int]) -> None:
         idxLeft, idxRight = upRibIdx
-        while idxLeft != downRibIdx[0] or idxRight != downRibIdx[1]:
+        while idxLeft % len(leftFigure) != downRibIdx[0] or \
+                idxRight % len(rightFigure) != downRibIdx[1]:
             print('Цикл', 2)
             print(idxLeft, idxRight, downRibIdx)
             tr1: Triangle = Triangle(*bruteHull(
                 [rightFigure[idxRight],
-                leftFigure[idxLeft],
-                leftFigure[(idxLeft + 1) % len(leftFigure)]]
-                ))
+                 leftFigure[idxLeft],
+                 leftFigure[(idxLeft + 1) % len(leftFigure)]]
+            ))
             tr2: Triangle = Triangle(*bruteHull([leftFigure[idxLeft],
-                                     rightFigure[(idxRight - 1) % len(rightFigure)],
-                                     rightFigure[idxRight]]))
+                                                 rightFigure[
+                                                     (idxRight - 1) % len(
+                                                         rightFigure)],
+                                                 rightFigure[idxRight]]))
             angleTr1: bool = checkAngle(leftFigure[idxLeft],
                                         rightFigure[idxRight],
                                         leftFigure
@@ -229,7 +284,8 @@ class WindowTriangulation:
                                                                % len(
                 leftFigure)]))
             if angleTr1 and checkDelone(*tr1.Nodes,
-                                        rightFigure[(idxRight - 1) % len(rightFigure)]) \
+                                        rightFigure[
+                                            (idxRight - 1) % len(rightFigure)]) \
                     and idxLeft != downRibIdx[0]:
                 findAdjacentTriangles(self.triangles, tr1)
                 self.triangles.append(tr1)
@@ -240,6 +296,8 @@ class WindowTriangulation:
                 self.triangles.append(tr2)
                 stableTriangle(tr2)
                 idxRight = (idxRight - 1) % len(rightFigure)
+                # if idxRight == -1:
+                #     idxRight = len(rightFigure) - 1
 
     def mergerHull(self, leftFigure, rightFigure):
         idxLeft, idxRight = 0, 0
