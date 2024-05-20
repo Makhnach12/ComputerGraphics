@@ -1,7 +1,7 @@
 import math
 import tkinter as tk
 
-from Lab1.launchPY.mainFunctions import getAngle
+from Lab1.launchPY.mainFunctions import getAngle, analyzeTriangle
 from Lab2.Parameters import WIDTH, HEIGHT, MIDDLE
 from Lab2.Root import drawGrid, drawAxes, CELL_SIZE
 from Lab2.dot import Dot
@@ -44,52 +44,10 @@ def sinA(a: Dot, b: Dot, c: Dot):
 
 
 def checkDelone(p1: Dot, p2: Dot, p3: Dot, p0: Dot) -> bool:
-    middle = Dot(0, 0)
-
-    def comparatorDots(dot1: Dot, dot2: Dot):
-        """Sorting by the hour"""
-        angle1 = (math.atan2(*(dot1 - middle).coorsNorm)) * 180 / 3.14
-        angle2 = (math.atan2(*(dot2 - middle).coorsNorm)) * 180 / 3.14
-        if angle1 - angle2 > 0:
-            return 1
-        elif angle1 - angle2 < 0:
-            return -1
-        else:
-            return 0
-
-    for elem in [p0, p1, p2, p3]:
-        middle += elem
-    middle /= 4
-    polygon = sorted([p0, p1, p2, p3], key=cmp_to_key(comparatorDots))
-    # s_a = (p0.x - p1.x) * (p0.x - p3.x) + (p0.y - p1.y) * (p0.y - p3.y)
-    # s_b = (p2.x - p1.x) * (p2.x - p3.x) + (p2.y - p1.y) * (p2.y - p3.y)
-    # if s_a < 0 and s_b < 0:
-    #     return False
-    # elif s_a >= 0 and s_b >= 0:
-    #     return True
     hull = bruteHull([p0, p1, p2, p3])
     if len(hull) == 3 and p0 not in hull:
         return False
-    midDotIndA = polygon.index(p0)
-    angleA = [polygon[(midDotIndA - 1) % len(polygon)], polygon[midDotIndA],
-              polygon[(midDotIndA + 1) % len(polygon)]]
-    sin_a = sinA(*angleA)
-    angleRadA = math.asin(sin_a)
-    # if (angleA[1].x - angleA[0].x) * (angleA[1].x - angleA[2].x) + \
-    #     (angleA[1].y - angleA[0].y) * (angleA[1].y - angleA[2].y) < 0:
-    #     angleRadA += math.pi / 2
-    # cos_a = sqrt(1 - sin_a * sin_a)
-    midDotIndB = polygon.index([elem for elem in polygon
-                                if elem not in angleA][0])
-    angleB = [polygon[(midDotIndB - 1) % len(polygon)], polygon[midDotIndB],
-              polygon[(midDotIndB + 1) % len(polygon)]]
-    sin_b = sinA(*angleB)
-    angleRadB = math.asin(sin_b)
-    # if (angleB[1].x - angleB[0].x) * (angleB[1].x - angleB[2].x) + \
-    #     (angleB[1].y - angleB[0].y) * (angleB[1].y - angleB[2].y) < 0:
-    #     angleRadB += math.pi / 2
-    # cos_b = sqrt(1 - sin_b * sin_b)
-    return angleRadA + angleRadB - math.pi < 0
+    return True
 
 
 def orientationAllDots(a: Dot, b: Dot, arr: list, sign):
@@ -154,57 +112,21 @@ def bruteHull(dots: list[Dot], polygonLines: list[dict] = None) -> list[Dot]:
     return borderDots
 
 
-def findAdjacentTriangles(triangles: list[Triangle], triangle: Triangle):
-    for elem in triangles:
-        elem.addNeighbor(triangle)
-        triangle.addNeighbor(elem)
-
-
-def addNeighbors(tr1: Triangle, tr2: Triangle):
-    tr1.addNeighbor(tr2)
-    tr2.addNeighbor(tr1)
-
-
-def swap(tr1: Triangle, tr2: Triangle):
-    boundDots: list[Dot] = [dot for dot in tr1.Nodes if dot not in tr2.Nodes]
-    boundDots += [dot for dot in tr2.Nodes if dot not in tr1.Nodes]
-    rib = [dot for dot in tr1.Nodes if dot not in boundDots]
-    newTr1 = Triangle(boundDots[0], boundDots[1], rib[0])
-    newTr2 = Triangle(boundDots[0], boundDots[1], rib[1])
-    addNeighbors(newTr1, newTr2)
-    for elem1, elem2 in zip(tr1.neighborTriangles.values(),
-                            tr2.neighborTriangles.values()):
-        if elem1 is tr2 or elem2 is tr1:
-            continue
-        newTr1.addNeighbor(elem1, elem2)
-        newTr2.addNeighbor(elem1, elem2)
-    return newTr1, newTr2
-
-
-def stableTriangle(triangle: Triangle):
-    isGood = False
-    while not isGood:
-        print('Цикл', 1)
-        isGood = True
-        for tr in triangle.neighborTriangles.values():
-            polygon = [elem for elem in triangle.Nodes]
-            polygon += [elem for elem in tr.Nodes if elem not in triangle.Nodes]
-            if len(polygon) == 3:
-                return
-            if not checkDelone(*polygon):
-                isGood = False
-                triangle, tr = swap(triangle, tr)
-                break
-
-
-def checkAngle(a: Dot, b: Dot, c: Dot) -> bool:
-    vectorBA: Dot = a - b
-    vectorBC: Dot = c - b
-    vectorComp: float = vectorBA.x * vectorBC.y - vectorBA.y * vectorBC.x
-    if vectorComp <= 0:
+def checkAngle(a: Dot, b: Dot) -> bool:
+    vectorComp: float = a.x * b.y - a.y * b.x
+    if vectorComp < 0:
         return False
     else:
         return True
+
+
+def isLine(arr: list[Dot]) -> bool:
+    setX: set = set()
+    setY: set = set()
+    for elem in arr:
+        setX.add(elem.x)
+        setY.add(elem.y)
+    return len(setY) == 1 or len(setX) == 1
 
 
 class WindowTriangulation:
@@ -246,58 +168,86 @@ class WindowTriangulation:
             y=HEIGHT // 10 + 149
         )
 
+    def animLine(self, idx: int):
+        if idx == len(self.interLines):
+            for i in range(len(self.interLines)):
+                if self.interLines[i]['color'] != 'yellow':
+                    self.canvas.delete(self.Lines[i])
+            return
+        if idx - 1 >= 0 and self.interLines[idx - 1]['color'] == 'green':
+            self.canvas.delete(self.Lines[idx - 1])
+        self.Lines.append(self.canvas.create_line(
+            self.interLines[idx]['stDot'].coors,
+            self.interLines[idx]['finDot'].coors,
+            fill=self.interLines[idx]['color'], width=2))
+        self.root.after(500, lambda: self.animLine(idx + 1))
+
     def createMergeTriangulation(self, leftFigure: list[Dot],
                                  rightFigure: list[Dot],
                                  upRibIdx: tuple[int, int],
-                                 downRibIdx: tuple[int]) -> None:
+                                 downRibIdx: tuple[int, int]) -> None:
         idxLeft, idxRight = upRibIdx
-        while idxLeft % len(leftFigure) != downRibIdx[0] or \
-                idxRight % len(rightFigure) != downRibIdx[1]:
-            print('Цикл', 2)
-            print(idxLeft, idxRight, downRibIdx)
-            tr1: Triangle = Triangle(*bruteHull(
-                [rightFigure[idxRight],
-                 leftFigure[idxLeft],
-                 leftFigure[(idxLeft + 1) % len(leftFigure)]]
-            ))
-            tr2: Triangle = Triangle(*bruteHull([leftFigure[idxLeft],
-                                                 rightFigure[
-                                                     (idxRight - 1) % len(
-                                                         rightFigure)],
-                                                 rightFigure[idxRight]]))
-            angleTr1: bool = checkAngle(leftFigure[idxLeft],
-                                        rightFigure[idxRight],
-                                        leftFigure
-                                        [
-                                            (idxLeft + 1) % len(leftFigure)
-                                            ])
-            angleTr2: bool = checkAngle(rightFigure
-                                        [
-                                            (idxRight - 1) % len(rightFigure)
-                                            ],
-                                        leftFigure[idxLeft],
-                                        rightFigure[idxRight])
-            print(angleTr1, checkDelone(*tr1.Nodes, rightFigure[(idxRight - 1)
-                                                                % len(
-                rightFigure)]))
-            print(angleTr2, checkDelone(*tr2.Nodes, leftFigure[(idxLeft + 1)
-                                                               % len(
-                leftFigure)]))
-            if angleTr1 and checkDelone(*tr1.Nodes,
-                                        rightFigure[
-                                            (idxRight - 1) % len(rightFigure)]) \
-                    and idxLeft != downRibIdx[0]:
-                findAdjacentTriangles(self.triangles, tr1)
+        # TODO: проверка на то что левая и правая фигуры это прямые тогда
+        # просто соеднияем их
+        if isLine(leftFigure) and isLine(rightFigure):
+            tr1: Triangle = Triangle(
+                rightFigure[0],
+                leftFigure[1],
+                rightFigure[1]
+            )
+            self.triangles.append(tr1)
+            return
+        isFirstIter: bool = False
+        while idxLeft != downRibIdx[0] or idxRight != downRibIdx[1]:
+            # если одна из точек достигла конца то просто двигаем вторую
+            # но не на первой итерации
+            idxLeftNext = (idxLeft + 1) % len(leftFigure)
+            idxRightNext = (idxRight - 1) % len(rightFigure)
+
+            if isFirstIter:
+                if idxLeft == downRibIdx[0]:
+                    tr1: Triangle = Triangle(
+                        rightFigure[idxRightNext],
+                        leftFigure[idxLeft],
+                        rightFigure[idxRight]
+                    )
+                    self.triangles.append(tr1)
+                    idxRight = idxRightNext
+                    continue
+                elif idxRight == downRibIdx[1]:
+                    tr1: Triangle = Triangle(
+                        leftFigure[idxLeftNext],
+                        leftFigure[idxLeft],
+                        rightFigure[idxRight]
+                    )
+                    self.triangles.append(tr1)
+                    idxLeft = idxLeftNext
+                    continue
+
+            angle: tuple[Dot, Dot] = (
+                leftFigure[idxLeft] - rightFigure[idxRight],
+                rightFigure[idxRightNext] - rightFigure[idxRight]
+            )
+            if checkAngle(*angle) and checkDelone(rightFigure[idxRightNext],
+                                                  leftFigure[idxLeft],
+                                                  rightFigure[idxRight],
+                                                  leftFigure[idxLeftNext]):
+                tr1: Triangle = Triangle(
+                    rightFigure[idxRightNext],
+                    leftFigure[idxLeft],
+                    rightFigure[idxRight]
+                )
                 self.triangles.append(tr1)
-                stableTriangle(tr1)
-                idxLeft = (idxLeft + 1) % len(leftFigure)
+                idxRight = idxRightNext
             else:
-                findAdjacentTriangles(self.triangles, tr2)
-                self.triangles.append(tr2)
-                stableTriangle(tr2)
-                idxRight = (idxRight - 1) % len(rightFigure)
-                # if idxRight == -1:
-                #     idxRight = len(rightFigure) - 1
+                tr1: Triangle = Triangle(
+                    leftFigure[idxLeftNext],
+                    leftFigure[idxLeft],
+                    rightFigure[idxRight]
+                )
+                self.triangles.append(tr1)
+                idxLeft = idxLeftNext
+            isFirstIter = True
 
     def mergerHull(self, leftFigure, rightFigure):
         idxLeft, idxRight = 0, 0
@@ -314,7 +264,6 @@ class WindowTriangulation:
                                 'finDot': rightFigure[upperRight],
                                 'color': 'green'})
         while not done:
-            print(3)
             done = True
             while not orientationAllDots(rightFigure[upperRight],
                                          leftFigure[upperLeft], leftFigure,
@@ -356,7 +305,6 @@ class WindowTriangulation:
         newFigure = []
         i = upperRight
         while i % len(rightFigure) != downRight:
-            print(5)
             newFigure.append(rightFigure[i % len(rightFigure)])
             i += 1
         else:
@@ -374,7 +322,6 @@ class WindowTriangulation:
 
         i = downLeft
         while i % len(leftFigure) != upperLeft:
-            print(6)
             newFigure.append(leftFigure[i % len(leftFigure)])
             i += 1
         else:
@@ -433,6 +380,16 @@ class WindowTriangulation:
             for elem in self.triangles:
                 elem.drawTriangle(self.canvas)
             return bruteHull(dots)
+        elif len(dots) == 5:
+            dots.append(dots[-1])
+            start = len(dots) // 2
+            left, right = [dots[i] for i in range(start)], \
+                [dots[i] for i in range(start, len(dots))]
+            left_hull, right_hull = self.divide(left), self.divide(right)
+            newFigure: list[Dot] = self.mergerHull(left_hull, right_hull)
+            for elem in self.triangles:
+                elem.drawTriangle(self.canvas)
+            return newFigure
         elif len(dots) == 8:
             print('Yes8')
             start = len(dots) // 2
@@ -443,6 +400,7 @@ class WindowTriangulation:
             for elem in self.triangles:
                 elem.drawTriangle(self.canvas)
             return newFigure
+        # TODO: если точек пять то дублируем одну
         elif len(dots) < 12:
             print('Yes<12')
             left, right = [dots[i] for i in range(3)], \
@@ -471,18 +429,12 @@ class WindowTriangulation:
                 return -1
             else:
                 if dot1.y - dot2.y > 0:
-                    return 1
-                elif dot1.y - dot2.y < 0:
                     return -1
-                return 0
+                elif dot1.y - dot2.y < 0:
+                    return 1
+            return 0
 
         self.dots = sorted(self.dots, key=cmp_to_key(comparatorDots))
+        for elem in self.dots:
+            print(elem)
         self.divide(self.dots)
-        # for i in range(len(finalFig) - 1):
-        #     self.interLines.append({'stDot': finalFig[i],
-        #                             'finDot': finalFig[i + 1],
-        #                             'color': 'yellow'})
-        # else:
-        #     self.interLines.append({'stDot': finalFig[-1],
-        #                             'finDot': finalFig[0],
-        #                             'color': 'yellow'})

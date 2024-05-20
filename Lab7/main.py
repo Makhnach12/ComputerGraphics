@@ -15,13 +15,13 @@ from math import sqrt
 from functools import cmp_to_key
 import numpy as np
 
+from Lab1.launchPY.mainFunctions import getAngle
 from Lab2.dot import Dot
 from Lab6.Window import bruteHull
 
-
 # from Lab1.launchPY.mainFunctions import getAngle
 # from Lab2.dot import Dot
-# from Lab7.Window import checkAngle, checkDelone
+from Lab7.Window import checkAngle, checkDelone
 
 # arr = {gg: 'gg', gg2: 'gg2'}
 # print(arr[Rib(Dot(0, 1), Dot(1, 1))])
@@ -30,14 +30,19 @@ from Lab7.Window import WindowTriangulation
 
 win = WindowTriangulation()
 win.root.mainloop()
+
+
 # a,b = (0,0 )
 # print(a, b)
-# dot1 = Dot(20, 160)
-# dot2 = Dot(-80, 60)
-# dot3 = Dot(-160, 160)
-# dot4 = Dot(-60, 140)
+dot1 = Dot(60, 0)
+dot2 = Dot(0, 80)
+dot3 = Dot(0, 100)
+# dot3 = Dot(-1, -1)
+# dot2 = Dot(0, 0)
+# dot1 = Dot(1, 0)
+dot4 = Dot(-60, 140)
 # print(getAngle(dot1, dot2, dot3))
-# print(checkAngle(dot1, dot2, dot3))
+print(checkAngle(dot1, dot2, dot3), 'res')
 # print(checkDelone(dot1, dot2, dot3, dot4))
 def checkAngle(a: Dot, b: Dot, c: Dot) -> bool:
     vectorBA: Dot = a - b
@@ -110,7 +115,7 @@ def checkDelone1(p1: Dot, p2: Dot, p3: Dot, p0: Dot) -> bool:
     sin_a = sinA(*angleA)
     angleRadA = math.asin(sin_a)
     if (angleA[1].x - angleA[0].x) * (angleA[1].x - angleA[2].x) + \
-        (angleA[1].y - angleA[0].y) * (angleA[1].y - angleA[2].y) < 0:
+            (angleA[1].y - angleA[0].y) * (angleA[1].y - angleA[2].y) < 0:
         angleRadA += math.pi
     # cos_a = sqrt(1 - sin_a * sin_a)
     midDotIndB = polygon.index([elem for elem in polygon
@@ -120,7 +125,7 @@ def checkDelone1(p1: Dot, p2: Dot, p3: Dot, p0: Dot) -> bool:
     sin_b = sinA(*angleB)
     angleRadB = math.asin(sin_b)
     if (angleB[1].x - angleB[0].x) * (angleB[1].x - angleB[2].x) + \
-        (angleB[1].y - angleB[0].y) * (angleB[1].y - angleB[2].y) < 0:
+            (angleB[1].y - angleB[0].y) * (angleB[1].y - angleB[2].y) < 0:
         angleRadB += math.pi
     # cos_b = sqrt(1 - sin_b * sin_b)
     return angleRadA + angleRadB - math.pi < 0
