@@ -15,6 +15,18 @@ SIGNS = {'>=': lambda elem: elem[0] >= elem[1],
          '<=': lambda elem: elem[0] <= elem[1]}
 
 
+def comparatorDots(dot1: Dot, dot2: Dot):
+    if dot1.x - dot2.x > 0:
+        return 1
+    elif dot1.x - dot2.x < 0:
+        return -1
+    else:
+        if dot1.y - dot2.y > 0:
+            return -1
+        elif dot1.y - dot2.y < 0:
+            return 1
+    return 0
+
 def checkTriangles(tr1: Triangle, tr2: Triangle) -> bool:
     angles1: list[float] = [getAngle(
         tr1.Nodes[i],
@@ -346,6 +358,10 @@ class WindowTriangulation:
         self.createMergeTriangulation(leftFigure, rightFigure,
                                       (upperLeft, upperRight),
                                       (downLeft, downRight))
+        newFigure = sortByHour(newFigure)
+        if isLine(newFigure):
+            newFigure = sorted(newFigure, key=cmp_to_key(comparatorDots))
+            return [newFigure[0], newFigure[-1]]
         return sortByHour(newFigure)
 
     def divide(self, dots):
@@ -406,18 +422,6 @@ class WindowTriangulation:
             return newFigure
 
     def startDivide(self):
-        def comparatorDots(dot1: Dot, dot2: Dot):
-            if dot1.x - dot2.x > 0:
-                return 1
-            elif dot1.x - dot2.x < 0:
-                return -1
-            else:
-                if dot1.y - dot2.y > 0:
-                    return -1
-                elif dot1.y - dot2.y < 0:
-                    return 1
-            return 0
-
         self.dots = sorted(self.dots, key=cmp_to_key(comparatorDots))
         self.divide(self.dots)
         self.animLine(0)
